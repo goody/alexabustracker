@@ -3,12 +3,12 @@ var cta = require('cta-bus-tracker');
 var busTracker = cta(process.env.API_KEY);
 
 
-busTracker.vehiclesByRoute( ['81'], function ( err, data ) {
-    if ( err ) {
-        console.log('error:',err);
-    }
-    console.log('vehiclesByRoute:',data);
-} );
+// busTracker.vehiclesByRoute( ['81'], function ( err, data ) {
+//     if ( err ) {
+//         console.log('error:',err);
+//     }
+//     console.log('vehiclesByRoute:',data);
+// } );
 
 var options = {
     // a list of up to 10 stop IDs 
@@ -22,5 +22,21 @@ busTracker.predictionsByStop( options, function ( err, data ) {
     if ( err ) {
         console.log('err:', err);
     }
-    console.log('predictionsByStop:', data);
+    if(typeof data === "object"){
+        _getArrivalTime(data.prdtm);
+    } else {
+        var howManyBuses = data.length;
+        for (var i=0; i < howManyBuses; i++){
+            _getArrivalTime(data[i].prdtm);
+        }
+    }
 } );
+
+function _getArrivalTime(expectedTime){
+    var expected = new Date(expectedTime);
+    expected = expected.getTime() / 1000;
+    var current = new Date();
+    current = Math.floor(current.getTime() / 1000);
+    var arriving = Math.floor((expected - current) / 60);
+    console.log('Next bus in ' + arriving + ' minutes.');
+}
