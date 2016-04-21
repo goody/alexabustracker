@@ -12,25 +12,31 @@ var busTracker = cta(process.env.API_KEY);
 
 var options = {
     // a list of up to 10 stop IDs 
-    stopIds: [ "3766" ],
+    stopIds: [ "15160" ],
+    //stopIds: [ "3766" ],
     // topCount is optional 
     topCount: 5
 };
  
  //TODO: returns an obj if there's only one bus and an array if there're more than one 
-busTracker.predictionsByStop( options, function ( err, data ) {
-    if ( err ) {
+busTracker.predictionsByStop(options, function (err, data) {
+    if (err) {
         console.log('err:', err);
     }
-    if(typeof data === "object"){
-        _getArrivalTime(data.prdtm);
+
+    if (data == null) {
+        console.log('There are no buses near.');
     } else {
-        var howManyBuses = data.length;
-        for (var i=0; i < howManyBuses; i++){
-            _getArrivalTime(data[i].prdtm);
+        if (Array.isArray(data)) {
+            var howManyBuses = data.length;
+            for (var i = 0; i < howManyBuses; i++) {
+                _getArrivalTime(data[i].prdtm);
+            }
+        } else {
+            _getArrivalTime(data.prdtm);
         }
     }
-} );
+});
 
 function _getArrivalTime(expectedTime){
     var expected = new Date(expectedTime);
