@@ -2,7 +2,7 @@
   "name": "alexa-cta-bus-tracker",
   "version": "1.0.0",
   "description": "CTA Bus Tracker for Amazon's Alexa",
-  "main": "app.js",
+  "main": "alexa.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
