@@ -39,9 +39,9 @@ function getSchedule(options) {
                             busTimes += ' and ';
                         }
                     }
-                    responseText = 'Bus Stop ' + options.stopIds + ' has ' + howManyBuses + ' buses arriving in ' + busTimes + ' minutes';
+                    responseText = 'The east bound 81 from Clark has ' + howManyBuses + ' buses arriving in ' + busTimes + ' minutes';
                 } else {
-                    responseText = 'Bus Stop ' + options.stopIds + ' has one bus arriving in ' + _getArrivalTime(data.prdtm) + ' minutes.';
+                    responseText = 'The east bound 81 from Clark has one bus arriving in ' + _getArrivalTime(data.prdtm) + ' minutes.';
                 }
             }
             resolve(responseText);

@@ -123,7 +123,7 @@ function getWelcomeResponse(callback) {
         console.log('val: ', val);
         var sessionAttributes = {};
         var cardTitle = "Welcome";
-        var speechOutput = testText;
+        var speechOutput = busText;
         // If we wanted to initialize the session to have some attributes we could add those here.
     // var sessionAttributes = {};
     // var cardTitle = "Welcome";
