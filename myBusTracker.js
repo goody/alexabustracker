@@ -3,8 +3,6 @@ var cta = require('cta-bus-tracker');
 var busTracker = cta('eXDDtJt4dirsrLFmiY7UDryHU');
 var moment = require('moment-timezone');
 
-var test = moment().tz("America/Chicago").format();
-console.log('mtz: ' + test);
 // busTracker.vehiclesByRoute( ['81'], function ( err, data ) {
 //     if ( err ) {
 //         console.log('error:',err);
@@ -14,8 +12,8 @@ console.log('mtz: ' + test);
 
 var options = {
     // a list of up to 10 stop IDs 
-    stopIds: [ "3756" ],
-    //stopIds: [ "3766" ],
+    //stopIds: [ "3756" ],
+    stopIds: [ "3766" ],
     // topCount is optional 
     topCount: 5
 };
@@ -41,9 +39,9 @@ function getSchedule(options) {
                             busTimes += ' and ';
                         }
                     }
-                    responseText = 'There are ' + howManyBuses + ' buses arriving in ' + busTimes + ' minutes';
+                    responseText = 'Bus Stop ' + options.stopIds + ' has ' + howManyBuses + ' buses arriving in ' + busTimes + ' minutes';
                 } else {
-                    responseText = 'There is one bus arriving in ' + _getArrivalTime(data.prdtm) + ' minutes.';
+                    responseText = 'Bus Stop ' + options.stopIds + ' has one bus arriving in ' + _getArrivalTime(data.prdtm) + ' minutes.';
                 }
             }
             resolve(responseText);
@@ -58,6 +56,7 @@ function _getArrivalTime(expectedTime){
     var expected = moment(expectedTime).tz("America/Chicago").format();
     var current = moment().tz("America/Chicago").format();
     var arriving = moment(expected).diff(current,'minutes');
+    console.log(typeof arriving);
     console.log('expt: ' + expected, 'curr: ' + current);
     //var arriving = Math.floor((expected - current) / 60);
     console.log('Next bus in ' + arriving + ' minutes.');

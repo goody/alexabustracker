@@ -121,9 +121,9 @@ function getWelcomeResponse(callback) {
     busTracker.getSchedule(options).then(function (val) {
         testText = val;
         console.log('val: ', val);
-            var sessionAttributes = {};
-    var cardTitle = "Welcome";
-    var speechOutput = "Hello " + testText;
+        var sessionAttributes = {};
+        var cardTitle = "Welcome";
+        var speechOutput = 'Hello.  I love timezone' + process.env.TZ + ' ' + testText;
         // If we wanted to initialize the session to have some attributes we could add those here.
     // var sessionAttributes = {};
     // var cardTitle = "Welcome";
@@ -131,7 +131,7 @@ function getWelcomeResponse(callback) {
         //"Which stop are you looking for buses at?  For example, stop number 3766 and " + process.env.API_KEY;
     // If the user either does not reply to the welcome message or says something that is not
     // understood, they will be prompted again with this text.
-    var repromptText = "Please tell me which stop you're getting a bus at.";
+    var repromptText = "Goodbye.";
     var shouldEndSession = false;
 
     callback(sessionAttributes,
