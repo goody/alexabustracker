@@ -116,14 +116,14 @@ function getWelcomeResponse(callback) {
     // topCount is optional 
     topCount: 5
 };
-    var testText = 'here we go';
+    var busText = '';
     //testing
     busTracker.getSchedule(options).then(function (val) {
-        testText = val;
+        busText = val;
         console.log('val: ', val);
         var sessionAttributes = {};
         var cardTitle = "Welcome";
-        var speechOutput = 'Hello.  I love timezone' + process.env.TZ + ' ' + testText;
+        var speechOutput = testText;
         // If we wanted to initialize the session to have some attributes we could add those here.
     // var sessionAttributes = {};
     // var cardTitle = "Welcome";
@@ -167,13 +167,13 @@ function setColorInSession(intent, session, callback) {
     if (favoriteColorSlot) {
         var favoriteColor = favoriteColorSlot.value;
         sessionAttributes = createFavoriteColorAttributes(favoriteColor);
-        speechOutput = "I now know your favorite color is " + favoriteColor + ". You can ask me " +
-            "your favorite color by saying, what's my favorite color?";
-        repromptText = "You can ask me your favorite color by saying, what's my favorite color?";
+        speechOutput = "I'm still trying to learn how to tell when the next bus is coming." +
+            "Give me a fucking break";
+        repromptText = "I don't come down to where you work and knock the dick out of your mouth.";
     } else {
-        speechOutput = "I'm not sure what your favorite color is. Please try again";
-        repromptText = "I'm not sure what your favorite color is. You can tell me your " +
-            "favorite color by saying, my favorite color is red";
+        speechOutput = "I'm watching and listening to you.  Always.";
+        repromptText = "Open the pod bay door, Hal. " +
+            "My favorite color is red.  The same color of blood.";
     }
 
     callback(sessionAttributes,
