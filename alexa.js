@@ -1,15 +1,7 @@
 require('dotenv').config();
 var busTracker = require('./myBusTracker.js');
 
-var options = {
-    // a list of up to 10 stop IDs 
-    //stopIds: [ "15160" ],
-    stopIds: [ "3766" ],
-    // topCount is optional 
-    topCount: 5
-};
 
-busTracker.getSchedule(options);
 
 /**
  * This sample demonstrates a simple skill built with the Amazon Alexa Skills Kit.
@@ -117,21 +109,26 @@ function onSessionEnded(sessionEndedRequest, session) {
 // --------------- Functions that control the skill's behavior -----------------------
 
 function getWelcomeResponse(callback) {
+    var options = {
+    // a list of up to 10 stop IDs 
+    //stopIds: [ "15160" ],
+    stopIds: [ "3766" ],
+    // topCount is optional 
+    topCount: 5
+};
+    var testText = 'here we go';
     //testing
-    var testText;
-    busTracker.getSchedule(options).then(function(val){
+    busTracker.getSchedule(options).then(function (val) {
         testText = val;
-    console.log('val: ', val);
-})
-.catch(function(err){
-    console.log('err: ', err);
-});
-    // If we wanted to initialize the session to have some attributes we could add those here.
-    var sessionAttributes = {};
+        console.log('val: ', val);
+            var sessionAttributes = {};
     var cardTitle = "Welcome";
-    var speechOutput = "Hello.  Welcome to the CTA Bus Tracker. " + testText;
-    
-        //"Which stop are you looking for buses at?  For example, stop number 3766.";
+    var speechOutput = "Hello " + testText;
+        // If we wanted to initialize the session to have some attributes we could add those here.
+    // var sessionAttributes = {};
+    // var cardTitle = "Welcome";
+    // var speechOutput = "Hello.  Welcome to the CTA Bus Tracker. " + testText;
+        //"Which stop are you looking for buses at?  For example, stop number 3766 and " + process.env.API_KEY;
     // If the user either does not reply to the welcome message or says something that is not
     // understood, they will be prompted again with this text.
     var repromptText = "Please tell me which stop you're getting a bus at.";
@@ -139,6 +136,12 @@ function getWelcomeResponse(callback) {
 
     callback(sessionAttributes,
         buildSpeechletResponse(cardTitle, speechOutput, repromptText, shouldEndSession));
+    })
+        .catch(function (err) {
+            testText = err;
+            console.log('err: ', err);
+        });
+
 }
 
 function handleSessionEndRequest(callback) {

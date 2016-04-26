@@ -12,8 +12,8 @@ var busTracker = cta('eXDDtJt4dirsrLFmiY7UDryHU');
 
 var options = {
     // a list of up to 10 stop IDs 
-    //stopIds: [ "15160" ],
-    stopIds: [ "3766" ],
+    stopIds: [ "3756" ],
+    //stopIds: [ "3766" ],
     // topCount is optional 
     topCount: 5
 };
@@ -31,10 +31,13 @@ function getSchedule(options) {
                 console.log('There are no buses near.');
             } else {
                 if (Array.isArray(data)) {
-                    var howManyBuses = data.length;
+                    var howManyBuses;
                     var busTimes = 'filler for bus times';
                     for (var i = 0; i < howManyBuses; i++) {
-                        busTimes = _getArrivalTime(data[i].prdtm) + ' ';
+                        busTimes += _getArrivalTime(data[i].prdtm).toString();
+                        if(i < howManyBuses-1){
+                            busTimes += ' and ';
+                        }
                     }
                     responseText = 'There are ' + howManyBuses + ' arriving in ' + busTimes + ' minutes';
                 } else {
@@ -51,9 +54,10 @@ function getSchedule(options) {
 
 function _getArrivalTime(expectedTime){
     var expected = new Date(expectedTime);
-    expected = expected.getTime() / 1000;
+    expected = Math.floor((expected.getTime() + 3600) / 1000);
     var current = new Date();
     current = Math.floor(current.getTime() / 1000);
+    console.log('expt: ' + expected, 'curr: ' + current);
     var arriving = Math.floor((expected - current) / 60);
     console.log('Next bus in ' + arriving + ' minutes.');
     return arriving.toString();
