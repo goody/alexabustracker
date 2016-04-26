@@ -1,8 +1,10 @@
 require('dotenv').config();
 var cta = require('cta-bus-tracker');
 var busTracker = cta('eXDDtJt4dirsrLFmiY7UDryHU');
+var moment = require('moment-timezone');
 
-
+var test = moment().tz("America/Chicago").format();
+console.log('mtz: ' + test);
 // busTracker.vehiclesByRoute( ['81'], function ( err, data ) {
 //     if ( err ) {
 //         console.log('error:',err);
@@ -31,15 +33,15 @@ function getSchedule(options) {
                 console.log('There are no buses near.');
             } else {
                 if (Array.isArray(data)) {
-                    var howManyBuses;
-                    var busTimes = 'filler for bus times';
+                    var howManyBuses = data.length;
+                    var busTimes = '';
                     for (var i = 0; i < howManyBuses; i++) {
                         busTimes += _getArrivalTime(data[i].prdtm).toString();
                         if(i < howManyBuses-1){
                             busTimes += ' and ';
                         }
                     }
-                    responseText = 'There are ' + howManyBuses + ' arriving in ' + busTimes + ' minutes';
+                    responseText = 'There are ' + howManyBuses + ' buses arriving in ' + busTimes + ' minutes';
                 } else {
                     responseText = 'There is one bus arriving in ' + _getArrivalTime(data.prdtm) + ' minutes.';
                 }
@@ -53,12 +55,11 @@ function getSchedule(options) {
 }
 
 function _getArrivalTime(expectedTime){
-    var expected = new Date(expectedTime);
-    expected = Math.floor((expected.getTime() + 3600) / 1000);
-    var current = new Date();
-    current = Math.floor(current.getTime() / 1000);
+    var expected = moment(expectedTime).tz("America/Chicago").format();
+    var current = moment().tz("America/Chicago").format();
+    var arriving = moment(expected).diff(current,'minutes');
     console.log('expt: ' + expected, 'curr: ' + current);
-    var arriving = Math.floor((expected - current) / 60);
+    //var arriving = Math.floor((expected - current) / 60);
     console.log('Next bus in ' + arriving + ' minutes.');
     return arriving.toString();
 }
