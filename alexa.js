@@ -22,14 +22,14 @@ exports.handler = function (event, context) {
          * Uncomment this if statement and populate with your skill's application ID to
          * prevent someone else from configuring a skill that sends requests to this function.
          */
-        
-/*        if (event.session.application.applicationId !== "amzn1.echo-sdk-ams.app." + process.env.APPLICATION_ID) {
-             context.fail("Invalid Application ID");
-        }*/
-        
+
+        /*        if (event.session.application.applicationId !== "amzn1.echo-sdk-ams.app." + process.env.APPLICATION_ID) {
+                     context.fail("Invalid Application ID");
+                }*/
+
 
         if (event.session.new) {
-            onSessionStarted({requestId: event.request.requestId}, event.session);
+            onSessionStarted({ requestId: event.request.requestId }, event.session);
         }
 
         if (event.request.type === "LaunchRequest") {
@@ -83,8 +83,8 @@ function onIntent(intentRequest, session, callback) {
         intentName = intentRequest.intent.name;
 
     // Dispatch to your skill's intent handlers
-    if ("MyColorIsIntent" === intentName) {
-        setColorInSession(intent, session, callback);
+    if ("NextBusIntent" === intentName) {
+        getBus(intent, session, callback);
     } else if ("WhatsMyColorIntent" === intentName) {
         getColorFromSession(intent, session, callback);
     } else if ("AMAZON.HelpIntent" === intentName) {
@@ -109,13 +109,30 @@ function onSessionEnded(sessionEndedRequest, session) {
 // --------------- Functions that control the skill's behavior -----------------------
 
 function getWelcomeResponse(callback) {
+    // If we wanted to initialize the session to have some attributes we could add those here.
+    var sessionAttributes = {};
+    var cardTitle = "Welcome";
+    var speechOutput = "Welcome to the See Tee Ay Bus Tracker. " +
+        "Please tell me which bust stop you would like the scheudle for.  For example ask me,  when is the next bus at bus stop 3773";
+    // If the user either does not reply to the welcome message or says something that is not
+    // understood, they will be prompted again with this text.
+    var repromptText = "Which bus stop would you like to know the schedule for, " +
+        "my favorite color is red";
+    var shouldEndSession = false;
+
+    callback(sessionAttributes,
+        buildSpeechletResponse(cardTitle, speechOutput, repromptText, shouldEndSession));
+}
+
+function getBus(intent, session, callback) {
+
     var options = {
-    // a list of up to 10 stop IDs 
-    //stopIds: [ "15160" ],
-    stopIds: [ "3766" ],
-    // topCount is optional 
-    topCount: 5
-};
+        // a list of up to 10 stop IDs 
+        //stopIds: [ "15160" ],
+        stopIds: ["3766"],
+        // topCount is optional 
+        topCount: 5
+    };
     var busText = '';
     //testing
     busTracker.getSchedule(options).then(function (val) {
@@ -125,17 +142,17 @@ function getWelcomeResponse(callback) {
         var cardTitle = "Welcome";
         var speechOutput = busText;
         // If we wanted to initialize the session to have some attributes we could add those here.
-    // var sessionAttributes = {};
-    // var cardTitle = "Welcome";
-    // var speechOutput = "Hello.  Welcome to the CTA Bus Tracker. " + testText;
+        // var sessionAttributes = {};
+        // var cardTitle = "Welcome";
+        // var speechOutput = "Hello.  Welcome to the CTA Bus Tracker. " + testText;
         //"Which stop are you looking for buses at?  For example, stop number 3766 and " + process.env.API_KEY;
-    // If the user either does not reply to the welcome message or says something that is not
-    // understood, they will be prompted again with this text.
-    var repromptText = "Goodbye.";
-    var shouldEndSession = false;
+        // If the user either does not reply to the welcome message or says something that is not
+        // understood, they will be prompted again with this text.
+        var repromptText = "Goodbye.";
+        var shouldEndSession = false;
 
-    callback(sessionAttributes,
-        buildSpeechletResponse(cardTitle, speechOutput, repromptText, shouldEndSession));
+        callback(sessionAttributes,
+            buildSpeechletResponse(cardTitle, speechOutput, repromptText, shouldEndSession));
     })
         .catch(function (err) {
             testText = err;
@@ -177,7 +194,7 @@ function setColorInSession(intent, session, callback) {
     }
 
     callback(sessionAttributes,
-         buildSpeechletResponse(cardTitle, speechOutput, repromptText, shouldEndSession));
+        buildSpeechletResponse(cardTitle, speechOutput, repromptText, shouldEndSession));
 }
 
 function createFavoriteColorAttributes(favoriteColor) {
@@ -209,7 +226,7 @@ function getColorFromSession(intent, session, callback) {
     // If the user does not respond or says something that is not understood, the session
     // will end.
     callback(sessionAttributes,
-         buildSpeechletResponse(intent.name, speechOutput, repromptText, shouldEndSession));
+        buildSpeechletResponse(intent.name, speechOutput, repromptText, shouldEndSession));
 }
 
 // --------------- Helpers that build all of the responses -----------------------
