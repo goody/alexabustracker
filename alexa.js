@@ -126,10 +126,12 @@ function getWelcomeResponse(callback) {
 
 function getBus(intent, session, callback) {
 
+    var busStop = intent.slots.BusStop.value || 3766;
     var options = {
         // a list of up to 10 stop IDs 
-        //stopIds: [ "15160" ],
-        stopIds: ["3766"],
+        //TODO: not sure why array
+        stopIds: [ busStop ],
+        //stopIds: ["3766"],
         // topCount is optional 
         topCount: 5
     };
