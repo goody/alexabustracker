@@ -26,9 +26,9 @@ function getSchedule(options) {
             if (err) {
                 console.log('err:', err);
             }
+            console.dir(data);
             if (data == null) {
                 responseText = 'There are no buses near.';
-                console.log('There are no buses near.');
             } else {
                 if (Array.isArray(data)) {
                     var howManyBuses = data.length;
@@ -39,9 +39,9 @@ function getSchedule(options) {
                             busTimes += ' and ';
                         }
                     }
-                    responseText = 'Bus stop number ' + options.stopIds[0] + ' has ' + howManyBuses + ' buses arriving in ' + busTimes + ' minutes';
+                    responseText = 'The ' + data[0].rtdir + ' ' + data[0].rt + ' bus at ' + data[0].stpnm + ' has ' + howManyBuses + ' buses arriving in ' + busTimes + ' minutes';
                 } else {
-                    responseText = 'Bus stop number ' + options.stopIds[0] + ' has one bus arriving in ' + _getArrivalTime(data.prdtm) + ' minutes.';
+                    responseText = 'The ' + data.rtdir + ' ' + data.rt + ' bus at ' + data.stpnm + ' has one bus arriving in ' + _getArrivalTime(data.prdtm) + ' minutes.';
                 }
             }
             resolve(responseText);
@@ -56,10 +56,6 @@ function _getArrivalTime(expectedTime){
     var expected = moment(expectedTime).tz("America/Chicago").format();
     var current = moment().tz("America/Chicago").format();
     var arriving = moment(expected).diff(current,'minutes');
-    console.log(typeof arriving);
-    console.log('expt: ' + expected, 'curr: ' + current);
-    //var arriving = Math.floor((expected - current) / 60);
-    console.log('Next bus in ' + arriving + ' minutes.');
     return arriving.toString();
 }
 
