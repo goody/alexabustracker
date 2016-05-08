@@ -1,17 +1,6 @@
 require('dotenv').config();
 var busTracker = require('./myBusTracker.js');
 
-
-
-/**
- * This sample demonstrates a simple skill built with the Amazon Alexa Skills Kit.
- * The Intent Schema, Custom Slots, and Sample Utterances for this skill, as well as
- * testing instructions are located at http://amzn.to/1LzFrj6
- *
- * For additional samples, visit the Alexa Skills Kit Getting Started guide at
- * http://amzn.to/1LGWsLG
- */
-
 // Route the incoming request based on type (LaunchRequest, IntentRequest,
 // etc.) The JSON body of the request is provided in the event parameter.
 exports.handler = function (event, context) {
@@ -116,8 +105,7 @@ function getWelcomeResponse(callback) {
         "Please tell me which bust stop you would like the scheudle for.  For example ask me,  when is the next bus at bus stop 3773";
     // If the user either does not reply to the welcome message or says something that is not
     // understood, they will be prompted again with this text.
-    var repromptText = "Which bus stop would you like to know the schedule for, " +
-        "my favorite color is red";
+    var repromptText = "Which bus stop would you like to know the schedule for";
     var shouldEndSession = false;
 
     callback(sessionAttributes,
@@ -139,17 +127,12 @@ function getBus(intent, session, callback) {
     //testing
     busTracker.getSchedule(options).then(function (val) {
         busText = val;
-        console.log('val: ', val);
         var sessionAttributes = {};
         var cardTitle = "Welcome";
         var speechOutput = busText;
         // If we wanted to initialize the session to have some attributes we could add those here.
         // var sessionAttributes = {};
-        // var cardTitle = "Welcome";
-        // var speechOutput = "Hello.  Welcome to the CTA Bus Tracker. " + testText;
-        //"Which stop are you looking for buses at?  For example, stop number 3766 and " + process.env.API_KEY;
-        // If the user either does not reply to the welcome message or says something that is not
-        // understood, they will be prompted again with this text.
+        var cardTitle = "Bus Schedule";
         var repromptText = "Goodbye.";
         var shouldEndSession = false;
 

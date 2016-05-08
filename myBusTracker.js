@@ -3,20 +3,13 @@ var cta = require('cta-bus-tracker');
 var busTracker = cta('eXDDtJt4dirsrLFmiY7UDryHU');
 var moment = require('moment-timezone');
 
-// busTracker.vehiclesByRoute( ['81'], function ( err, data ) {
-//     if ( err ) {
-//         console.log('error:',err);
-//     }
-//     console.log('vehiclesByRoute:',data);
-// } );
-
-var options = {
-    // a list of up to 10 stop IDs 
-    //stopIds: [ "3756" ],
-    stopIds: [ "3766" ],
-    // topCount is optional 
-    topCount: 5
-};
+//for local testing
+// var options = {
+//     // a list of up to 10 stop IDs 
+//     stopIds: [ "3766" ],
+//     // topCount is optional 
+//     topCount: 5
+// };
  
  //TODO: returns an obj if there's only one bus and an array if there're more than one 
 function getSchedule(options) {
@@ -26,7 +19,6 @@ function getSchedule(options) {
             if (err) {
                 console.log('err:', err);
             }
-            console.dir(data);
             if (data == null) {
                 responseText = 'There are no buses near.';
             } else {
@@ -48,8 +40,6 @@ function getSchedule(options) {
             reject(responseText);
         });
     });
-    // busPromise.then(function (val) { return responseText})
-    //     .catch(function (err) {  return responseText + err});
 }
 
 function _getArrivalTime(expectedTime){
@@ -59,12 +49,14 @@ function _getArrivalTime(expectedTime){
     return arriving.toString();
 }
 
-getSchedule(options).then(function(val){
-    console.log('val: ', val);
-})
-.catch(function(err){
-    console.log('err: ', err);
-});
+// for local testing
+// getSchedule(options).then(function(val){
+//     console.log('val: ', val);
+// })
+// .catch(function(err){
+//     console.log('err: ', err);
+// });
+
 module.exports = {
     getSchedule : getSchedule
 }
