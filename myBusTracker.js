@@ -2,6 +2,7 @@ require('dotenv').config();
 var cta = require('cta-bus-tracker');
 var busTracker = cta('eXDDtJt4dirsrLFmiY7UDryHU');
 var moment = require('moment-timezone');
+var _ = require('lodash');
 
 //for local testing
 // var options = {
@@ -48,6 +49,28 @@ function _getArrivalTime(expectedTime){
     var arriving = moment(expected).diff(current,'minutes');
     return arriving.toString();
 }
+
+var routeId = 81;
+routeDirection = 'Eastbound';
+
+busTracker.stops( routeId, routeDirection, function ( err, data ) {
+    if ( err ) {
+        console.dir(err);
+        // handle error
+    }
+    var test = _.filter(data, function(b){
+       return b.stpnm === 'Lawrence & Clark'; 
+    });
+    console.dir(test);
+    var options = { stopIds : [test[0].stpid] };
+    getSchedule(options).then(function (val) {
+        console.log('val: ', val);
+    })
+        .catch(function (err) {
+            console.log('err: ', err);
+        });
+    // console.dir(data);
+} );
 
 // for local testing
 // getSchedule(options).then(function(val){
