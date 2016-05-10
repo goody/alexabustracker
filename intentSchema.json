@@ -1,0 +1,37 @@
+{
+  "intents": [
+    {
+      "intent": "BusByStopIntent",
+      "slots": [
+        {
+          "name": "BusStop",
+          "type": "AMAZON.NUMBER"
+        }
+      ]
+    },
+    {
+      "intent": "BusByRouteIntent",
+      "slots": [
+        {
+          "name": "RouteDirection",
+          "type": "ROUTE_DIRECTION"
+        },
+        {
+          "name": "BusRouteNumber",
+          "type": "ROUTE_NUMBER"
+        },
+                {
+          "name": "BusRouteName",
+          "type": "ROUTE_NAME"
+        },
+        {
+          "name": "BusStopName",
+          "type": "BUS_STOP_NAME"
+        }        
+      ]
+    },    
+    {
+      "intent": "AMAZON.HelpIntent"
+    }
+  ]
+}
