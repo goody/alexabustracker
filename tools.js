@@ -51,21 +51,22 @@ function getAllStops() {
                 _(results.directions).forEach(function (val) {
                     console.log(results.route + ' -> ' + val);
                     _getRouteStops(results.route, val).then(function (sval) {
+                        console.log('sval: ' + sval);
                         stops += sval;
+                    }).then(function () {
+                        fs.writeFile('BUS_STOP_NAME.txt', stops, function (err) {
+                            if (err) {
+                                console.log('file error: ', err);
+                            } else {
+                                console.log('BUS_STOP_NAME file written');
+                            }
+                        });
                     });
                 });
             });
         });
     })
-        .then(function (stops) {
-            fs.writeFile('BUS_STOP_NAME.txt', stops, function (err) {
-                if (err) {
-                    console.log('file error: ', err);
-                } else {
-                    console.log('BUS_STOP_NAME file written');
-                }
-            });
-        })
+
 
 }
 
@@ -173,11 +174,12 @@ function _getRouteStops(routeId, direction) {
                 console.log('Route: ' + routeId + ':' + direction + ' err', err);
                 reject(err);
             }
+            console.dir(data);
             _(data).forEach(function (val) {
                 stops += val.stpnm + '\r\n';
             });
+             console.log('route stops built for ' + routeId + ':' + direction);
+            resolve(stops);
         });
-        console.log('route stops built for ' + routeId + ':' + direction);
-        resolve(stops);
     });
 }
