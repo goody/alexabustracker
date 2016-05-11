@@ -40,6 +40,7 @@ creates BUS_STOP_NAME.txt
 params
     routeNumber
     routeDirction
+    TODO:  hack...just removed dupes in Excel
 */
 
 function getAllStops() {

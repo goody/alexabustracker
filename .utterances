@@ -1,4 +1,4 @@
 BusByStopIntent when is the next bus at stop {BusStop}
 BusByStopIntent stop {BusStop}
 BusByStopIntent {BusStop}
-BusByRouteIntent the next {RouteDirection} {BusRouteNumber} bus at {BusStopName}
+BusByRouteIntent the next {RouteDirection} {BusRouteNumber} bus at {BusStopName} is

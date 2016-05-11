@@ -6,16 +6,9 @@ var _ = require('lodash');
 
 var fs = require('fs');
 
-//for local testing
-// var options = {
-//     // a list of up to 10 stop IDs 
-//     stopIds: [ "3766" ],
-//     // topCount is optional 
-//     topCount: 5
-// };
  
  //TODO: returns an obj if there's only one bus and an array if there're more than one 
-function getSchedule(options) {
+function getStopSchedule(options) {
     return new Promise(function (resolve, reject) {
         var responseText = "I'm waiting for a response.";
         busTracker.predictionsByStop(options, function (err, data) {
@@ -52,40 +45,72 @@ function _getArrivalTime(expectedTime){
     return arriving.toString();
 }
 
+function getRouteSchedule(options) {
+    return new Promise(function (resolve, reject) {
+        var responseText = '';
+        console.log('options', options);
+        //intent with route number, direction, and cross street
+        var routeId = options.BusRouteNumber;
+        var routeDirection = options.RouteDirection;
+        var busStopName = options.BusStopName;
 
-//intent with route number, direction, and cross street
-var routeId = 81;
-routeDirection = 'Eastbound';
-
-busTracker.stops(routeId, routeDirection, function (err, data) {
-    if (err) {
-        console.dir(err);
-        // handle error
-    }
-    //filter results on cross street
-    var test = _.filter(data, function (b) {
-        return b.stpnm === 'Lawrence & Clark';
-    });
-    console.dir(test);
-    var options = { stopIds: [test[0].stpid] };
-    getSchedule(options).then(function (val) {
-        console.log('val: ', val);
-    })
-        .catch(function (err) {
-            console.log('err: ', err);
+        busTracker.stops(routeId, routeDirection, function (err, data) {
+            if (err) {
+                console.dir(err);
+                reject(err);
+                // handle error
+            }
+            if (data == null) {
+                responseText = 'There are no buses near.';
+            }
+            //filter results on cross street
+            var test = _.filter(data, function (b) {
+                return b.stpnm === busStopName.replace('and', '&');
+            });
+            responseText = test;
         });
-    // console.dir(data);
-});
+                // console.log('val3:', test);
+                // var options = { stopIds: [val[0].stpid] };
+                // getStopSchedule(options).then(function (val) {
+
+                //     console.log('val2: ', val);
+                //     responseText = val;
+                // })
+                //     .catch(function (err) {
+                //         console.log('err: ', err);
+                //         reject(err);
+                //     });
+        resolve(responseText);
+    });
+}
+
+/***
+ * 
+ * Testing
+ * 
+ * */
+
+//for local testing
+var options = {
+    // // a list of up to 10 stop IDs 
+    // stopIds: [ "3766" ],
+    // // topCount is optional 
+    // topCount: 5
+    BusRouteNumber: 22,
+    RouteDirection: 'Northbound',
+    BusStopName: 'Clark and Lawrence'
+};
 
 
 // for local testing
-// getSchedule(options).then(function(val){
-//     console.log('val: ', val);
-// })
-// .catch(function(err){
-//     console.log('err: ', err);
-// });
+getRouteSchedule(options).then(function(val){
+    console.log('val final: ', val);
+})
+.catch(function(err){
+    console.log('err: ', err);
+});
 
 module.exports = {
-    getSchedule : getSchedule
+    getStopSchedule : getStopSchedule,
+    getRouteSchedule : getRouteSchedule
 }

@@ -72,10 +72,10 @@ function onIntent(intentRequest, session, callback) {
         intentName = intentRequest.intent.name;
 
     // Dispatch to your skill's intent handlers
-    if ("NextBusIntent" === intentName) {
-        getBus(intent, session, callback);
-    } else if ("WhatsMyColorIntent" === intentName) {
-        getColorFromSession(intent, session, callback);
+    if ("BusByStopIntent" === intentName) {
+        getBusByStop(intent, session, callback);
+    } else if ("BusByRouteIntent" === intentName) {
+        getBusByRoute(intent, session, callback);
     } else if ("AMAZON.HelpIntent" === intentName) {
         getWelcomeResponse(callback);
     } else if ("AMAZON.StopIntent" === intentName || "AMAZON.CancelIntent" === intentName) {
@@ -112,9 +112,9 @@ function getWelcomeResponse(callback) {
         buildSpeechletResponse(cardTitle, speechOutput, repromptText, shouldEndSession));
 }
 
-function getBus(intent, session, callback) {
-
-    var busStop = intent.slots.BusStop.value || 3766;
+function getBusByStop(intent, session, callback) {
+    var sessionAttributes = {};
+    var busStop = intent.slots.BusStopId.value || 3766;
     var options = {
         // a list of up to 10 stop IDs 
         //TODO: not sure why array
@@ -125,14 +125,40 @@ function getBus(intent, session, callback) {
     };
     var busText = '';
     //testing
-    busTracker.getSchedule(options).then(function (val) {
+    busTracker.getStopSchedule(options).then(function (val) {
         busText = val;
-        var sessionAttributes = {};
-        var cardTitle = "Welcome";
         var speechOutput = busText;
-        // If we wanted to initialize the session to have some attributes we could add those here.
-        // var sessionAttributes = {};
-        var cardTitle = "Bus Schedule";
+        var cardTitle = "Bus Stop Schedule";
+        var repromptText = "Goodbye.";
+        var shouldEndSession = false;
+
+        callback(sessionAttributes,
+            buildSpeechletResponse(cardTitle, speechOutput, repromptText, shouldEndSession));
+    })
+        .catch(function (err) {
+            testText = err;
+            console.log('err: ', err);
+        });
+
+}
+
+function getBusByRoute(intent, session, callback) {
+    var sessionAttributes = {};
+    var routeDirection = intent.slots.RouteDirection.value;
+    var busRouteNumber = intent.slots.BusRouteNumber.value;
+    var busStopName = intent.slots.BusStopName.value;
+
+    var options = {
+        RouteDirection: routeDirection,
+        BusRouteNumber: busRouteNumber,
+        BusStopName: busStopName
+    };
+    var busText = '';
+    //testing
+    busTracker.getRouteSchedule(options).then(function (val) {
+        busText = val;
+        var cardTitle = "Bus Route Schedule";
+        var speechOutput = busText;
         var repromptText = "Goodbye.";
         var shouldEndSession = false;
 
@@ -158,61 +184,6 @@ function handleSessionEndRequest(callback) {
 /**
  * Sets the color in the session and prepares the speech to reply to the user.
  */
-function setColorInSession(intent, session, callback) {
-    var cardTitle = intent.name;
-    var favoriteColorSlot = intent.slots.Color;
-    var repromptText = "";
-    var sessionAttributes = {};
-    var shouldEndSession = false;
-    var speechOutput = "";
-
-    if (favoriteColorSlot) {
-        var favoriteColor = favoriteColorSlot.value;
-        sessionAttributes = createFavoriteColorAttributes(favoriteColor);
-        speechOutput = "I'm still trying to learn how to tell when the next bus is coming." +
-            "Give me a fucking break";
-        repromptText = "I don't come down to where you work and knock the dick out of your mouth.";
-    } else {
-        speechOutput = "I'm watching and listening to you.  Always.";
-        repromptText = "Open the pod bay door, Hal. " +
-            "My favorite color is red.  The same color of blood.";
-    }
-
-    callback(sessionAttributes,
-        buildSpeechletResponse(cardTitle, speechOutput, repromptText, shouldEndSession));
-}
-
-function createFavoriteColorAttributes(favoriteColor) {
-    return {
-        favoriteColor: favoriteColor
-    };
-}
-
-function getColorFromSession(intent, session, callback) {
-    var favoriteColor;
-    var repromptText = null;
-    var sessionAttributes = {};
-    var shouldEndSession = false;
-    var speechOutput = "";
-
-    if (session.attributes) {
-        favoriteColor = session.attributes.favoriteColor;
-    }
-
-    if (favoriteColor) {
-        speechOutput = "Your favorite color is " + favoriteColor + ". Goodbye.";
-        shouldEndSession = true;
-    } else {
-        speechOutput = "I'm not sure what your favorite color is, you can say, my favorite color " +
-            " is red";
-    }
-
-    // Setting repromptText to null signifies that we do not want to reprompt the user.
-    // If the user does not respond or says something that is not understood, the session
-    // will end.
-    callback(sessionAttributes,
-        buildSpeechletResponse(intent.name, speechOutput, repromptText, shouldEndSession));
-}
 
 // --------------- Helpers that build all of the responses -----------------------
 
