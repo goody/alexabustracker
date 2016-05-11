@@ -113,36 +113,30 @@ function getWelcomeResponse(callback) {
 }
 
 function getBusByStop(intent, session, callback) {
+    var cardTitle = "Getting Bus by Stop";
+    var repromptText = "What number bus stop?";
+    var shouldEndSession = false;
     var sessionAttributes = {};
     var busStop = intent.slots.BusStopId.value || 3766;
     var options = {
-        // a list of up to 10 stop IDs 
-        //TODO: not sure why array
-        stopIds: [ busStop ],
-        //stopIds: ["3766"],
+        // a list of up to 10 stop IDs...currently only using one
+        stopIds: [busStop],
         // topCount is optional 
         topCount: 5
     };
-    var busText = '';
-    //testing
-    busTracker.getStopSchedule(options).then(function (val) {
-        busText = val;
-        var speechOutput = busText;
-        var cardTitle = "Bus Stop Schedule";
-        var repromptText = "Goodbye.";
-        var shouldEndSession = false;
-
+    var speechOutput = '';
+    busTracker.getStopSchedule(options).then(function (results) {
+        speechOutput = busTracker.renderBusText(results);
         callback(sessionAttributes,
             buildSpeechletResponse(cardTitle, speechOutput, repromptText, shouldEndSession));
-    })
-        .catch(function (err) {
-            testText = err;
-            console.log('err: ', err);
-        });
+    });
 
 }
 
 function getBusByRoute(intent, session, callback) {
+    var cardTitle = "Getting Bus by Route";
+    var repromptText = "Just tell me which bus.";
+    var shouldEndSession = false;
     var sessionAttributes = {};
     var routeDirection = intent.slots.RouteDirection.value;
     var busRouteNumber = intent.slots.BusRouteNumber.value;
@@ -153,21 +147,13 @@ function getBusByRoute(intent, session, callback) {
         BusRouteNumber: busRouteNumber,
         BusStopName: busStopName
     };
-    var busText = '';
-    //testing
-    busTracker.getRouteSchedule(options).then(function (val) {
-        busText = val;
-        var cardTitle = "Bus Route Schedule";
-        var speechOutput = busText;
-        var repromptText = "Goodbye.";
-        var shouldEndSession = false;
-
-        callback(sessionAttributes,
-            buildSpeechletResponse(cardTitle, speechOutput, repromptText, shouldEndSession));
-    })
-        .catch(function (err) {
-            testText = err;
-            console.log('err: ', err);
+    var speechOutput = '';
+    busTracker.getRouteStop(options)
+        .then(busTracker.getStopSchedule)
+        .then(function (results) {
+            speechOutput = renderBusText(results);
+            callback(sessionAttributes,
+                buildSpeechletResponse(cardTitle, speechOutput, repromptText, shouldEndSession));
         });
 
 }

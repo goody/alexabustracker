@@ -44,16 +44,15 @@ function getRouteStop(options) {
             }
             if (data == null) {
                 result = null;
+                resolve(result);
             } else {
                 //filter results on cross street
                 var stop = _.filter(data, function (b) {
                     return b.stpnm === busStopName.replace('and', '&');
                 });
-                console.log(stop);
                 result.stopIds = [stop[0].stpid];
-                console.log('test coming:');
+                resolve(result);
             }
-            resolve(result);
         });
     });
 }
@@ -100,24 +99,24 @@ function _getArrivalTime(expectedTime){
  * */
 
 //for local testing
-var options = {
-    // // a list of up to 10 stop IDs 
-    //stopIds: [ "3766" ],
-    // // topCount is optional 
-    // topCount: 5
-    BusRouteNumber: 22,
-    RouteDirection: 'Northbound',
-    BusStopName: 'Clark and Lawrence'
-};
+// var options = {
+//     // // a list of up to 10 stop IDs 
+//     //stopIds: [ "3766" ],
+//     // // topCount is optional 
+//     // topCount: 5
+//     BusRouteNumber: 22,
+//     RouteDirection: 'Northbound',
+//     BusStopName: 'Clark and Lawrence'
+// };
 
-// getStopSchedule(options).then(function(val){
-//    console.log(renderBusText(val)); 
+// // getStopSchedule(options).then(function(val){
+// //    console.log(renderBusText(val)); 
+// // });
+// getRouteStop(options)
+// .then(getStopSchedule)
+// .then(function(val){
+//     console.log(renderBusText(val));
 // });
-getRouteStop(options)
-.then(getStopSchedule)
-.then(function(val){
-    console.log(renderBusText(val));
-});
 
 // for local testing
 // getRouteSchedule(options).then(function(val){
