@@ -11,13 +11,14 @@ var busTracker = cta(process.env.API_KEY);
 var moment = require('moment-timezone');
 var _ = require('lodash');
 var fs = require('fs');
+var _TOOLS = 'tool_output/';
 
 /*
 fire off tools
 */
 
 //getRoutes();
-getAllStops();
+//getAllStops();
 //_getRoutes();
 // _getDirections('19').then(function(val){
 //     console.dir(val);
@@ -55,7 +56,7 @@ function getAllStops() {
                         console.log('sval: ' + sval);
                         stops += sval;
                     }).then(function () {
-                        fs.writeFile('BUS_STOP_NAME.txt', stops, function (err) {
+                        fs.writeFile(_TOOLS + 'BUS_STOP_NAME.txt', stops, function (err) {
                             if (err) {
                                 console.log('file error: ', err);
                             } else {
@@ -87,14 +88,14 @@ function getRoutes() {
             routeNumbers += val.rt + '\r\n';
             routeNames += val.rtnm + '\r\n';
         });
-        fs.writeFile('ROUTE_NUMBER.txt', routeNumbers, function (err) {
+        fs.writeFile(_TOOLS + 'ROUTE_NUMBER.txt', routeNumbers, function (err) {
             if (err) {
                 console.log('file error: ', err);
             } else {
                 console.log('ROUTE_NUMBER file written');
             }
         });
-        fs.writeFile('ROUTE_NAME.txt', routeNames, function (err) {
+        fs.writeFile(_TOOLS + 'ROUTE_NAME.txt', routeNames, function (err) {
             if (err) {
                 console.log('file error: ', err);
             } else {
