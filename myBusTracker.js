@@ -26,16 +26,25 @@ bad request ie bus stop name
   //TODO: node_module returns an obj if there's only one bus and an array if there're more than one 
   */
 function getStopSchedule(options) {
-    var responseText = {};
+    var response = {};
     if(options.stopIds === false){
-        return responseText.error = 'I had trouble finding the bus stop.';
+        response.error = 'I had trouble finding that bus stop.';
+        return response;
     }
     return new Promise(function (resolve, reject) {
         busTracker.predictionsByStop(options, function (err, data) {
             if (err) {
                 console.log('err:', err);
             }
-            resolve(data);
+            //bad stpid
+            if(data == null){
+                response.error = 'I had trouble finding that bus stop';
+                resolve(response);
+            } else {
+                response.busData = data;
+                resolve(response);
+            }
+            
         });
     });
 }
@@ -76,21 +85,22 @@ function getRouteStop(options) {
 
 function renderBusText(responseData) {
     var responseText = '';
-    if (responseData.error == null) {
+    if (responseData.error != null) {
         responseText = responseData.error;
     } else {
-        if (Array.isArray(responseData)) {
-            var howManyBuses = responseData.length;
+        var busData = responseData.busData;
+        if (Array.isArray(busData)) {
+            var howManyBuses = busData.length;
             var busTimes = '';
             for (var i = 0; i < howManyBuses; i++) {
-                busTimes += _getArrivalTime(responseData[i].prdtm).toString();
+                busTimes += _getArrivalTime(busData[i].prdtm).toString();
                 if (i < howManyBuses - 1) {
                     busTimes += ' and ';
                 }
             }
-            responseText = 'The ' + responseData[0].rtdir + ' ' + responseData[0].rt + ' bus at ' + responseData[0].stpnm + ' has ' + howManyBuses + ' buses arriving in ' + busTimes + ' minutes';
+            responseText = 'The ' + busData[0].rtdir + ' ' + busData[0].rt + ' bus at ' + busData[0].stpnm + ' has ' + howManyBuses + ' buses arriving in ' + busTimes + ' minutes';
         } else {
-            responseText = 'The ' + responseData.rtdir + ' ' + responseData.rt + ' bus at ' + responseData.stpnm + ' has one bus arriving in ' + _getArrivalTime(responseData.prdtm) + ' minutes.';
+            responseText = 'The ' + busData.rtdir + ' ' + busData.rt + ' bus at ' + busData.stpnm + ' has one bus arriving in ' + _getArrivalTime(busData.prdtm) + ' minutes.';
         }
     }
     return responseText;
@@ -121,24 +131,24 @@ function _toTitleCase(str)
  * */
 
 //for local testing
-// var options = {
-//     // // a list of up to 10 stop IDs 
-//     //stopIds: [ "3766" ],
-//     // // topCount is optional 
-//     // topCount: 5
-//     BusRouteNumber: 22,
-//     RouteDirection: 'Northbound',
-//     BusStopName: 'Clark and lawrence'
-// };
+var options = {
+    // // // a list of up to 10 stop IDs 
+    // stopIds: [ "3766" ],
+    // // topCount is optional 
+    // topCount: 5
+    BusRouteNumber: 22,
+    RouteDirection: 'Northbound',
+    BusStopName: 'Clark and lawrence'
+};
 
-// // getStopSchedule(options).then(function(val){
-// //    console.log(renderBusText(val)); 
-// // });
-// getRouteStop(options)
-// .then(getStopSchedule)
-// .then(function(val){
-//     console.log(renderBusText(val));
+// getStopSchedule(options).then(function(val){
+//    console.log(renderBusText(val)); 
 // });
+getRouteStop(options)
+.then(getStopSchedule)
+.then(function(val){
+    console.log(renderBusText(val));
+});
 
 // for local testing
 // getRouteSchedule(options).then(function(val){
