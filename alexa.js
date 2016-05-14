@@ -118,6 +118,8 @@ function getBusByStop(intent, session, callback) {
     var shouldEndSession = false;
     var sessionAttributes = {};
     var busStop = intent.slots.BusStopId.value || 3766;
+    console.log('REQUEST getBusByStop:');
+    console.log('stp: ' + busStop);
     var options = {
         // a list of up to 10 stop IDs...currently only using one
         stopIds: [busStop],
@@ -141,17 +143,21 @@ function getBusByRoute(intent, session, callback) {
     var routeDirection = intent.slots.RouteDirection.value;
     var busRouteNumber = intent.slots.BusRouteNumber.value;
     var busStopName = intent.slots.BusStopName.value;
-
+    var busRouteName = intent.slots.BusRouteName.value;
+    console.log('REQUEST getBusByRoute:');
+    console.log('dir: ' + routeDirection, '#: ' + busRouteNumber, 'stp: ' + busStopName, 'nm: ' + busRouteName);
     var options = {
         RouteDirection: routeDirection,
         BusRouteNumber: busRouteNumber,
+        BusRouteName: busRouteName,
         BusStopName: busStopName
     };
     var speechOutput = '';
     busTracker.getRouteStop(options)
         .then(busTracker.getStopSchedule)
         .then(function (results) {
-            speechOutput = renderBusText(results);
+            console.log(results);
+            speechOutput = busTracker.renderBusText(results);
             callback(sessionAttributes,
                 buildSpeechletResponse(cardTitle, speechOutput, repromptText, shouldEndSession));
         });

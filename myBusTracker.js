@@ -4,6 +4,16 @@ var busTracker = cta(process.env.API_KEY);
 var moment = require('moment-timezone');
 var _ = require('lodash');
 
+
+
+/*
+TODO's
+no results
+bad request ie bus stop name
+
+
+*/
+
 /**
  * 
  * public functions
@@ -16,7 +26,6 @@ var _ = require('lodash');
   //TODO: node_module returns an obj if there's only one bus and an array if there're more than one 
   */
 function getStopSchedule(options) {
-    console.log('getStopSchedule', options);
     return new Promise(function (resolve, reject) {
         busTracker.predictionsByStop(options, function (err, data) {
             if (err) {
@@ -33,8 +42,9 @@ function getStopSchedule(options) {
  */
 function getRouteStop(options) {
     return new Promise(function (resolve, reject) {
+        console.log('getRouteStop start.');
         var routeId = options.BusRouteNumber;
-        var routeDirection = options.RouteDirection;
+        var routeDirection = _toTitleCase(options.RouteDirection);
         var busStopName = options.BusStopName;
 
         busTracker.stops(routeId, routeDirection, function (err, data) {
@@ -90,6 +100,11 @@ function _getArrivalTime(expectedTime){
     var current = moment().tz("America/Chicago").format();
     var arriving = moment(expected).diff(current,'minutes');
     return arriving.toString();
+}
+
+function _toTitleCase(str)
+{
+    return str.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
 }
 
 /***
