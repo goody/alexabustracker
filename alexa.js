@@ -114,7 +114,7 @@ function getWelcomeResponse(callback) {
 
 function getBusByStop(intent, session, callback) {
     var cardTitle = "Getting Bus by Stop";
-    var repromptText = "What number bus stop?";
+    var repromptText = "";
     var shouldEndSession = false;
     var sessionAttributes = {};
     var busStop = intent.slots.BusStopId.value || 3766;
@@ -137,7 +137,7 @@ function getBusByStop(intent, session, callback) {
 
 function getBusByRoute(intent, session, callback) {
     var cardTitle = "Getting Bus by Route";
-    var repromptText = "Just tell me which bus.";
+    var repromptText = "";
     var shouldEndSession = false;
     var sessionAttributes = {};
     var routeDirection = intent.slots.RouteDirection.value;
