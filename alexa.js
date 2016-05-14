@@ -102,7 +102,7 @@ function getWelcomeResponse(callback) {
     var sessionAttributes = {};
     var cardTitle = "Welcome";
     var speechOutput = "Welcome to the See Tee Ay Bus Tracker. " +
-        "Please tell me which bust stop you would like the scheudle for.  For example ask me,  when is the next bus at bus stop 3773";
+        "Please tell me which bus stop you would like the schedule for.  For example, ask me,  when is the next bus at bus stop 3773";
     // If the user either does not reply to the welcome message or says something that is not
     // understood, they will be prompted again with this text.
     var repromptText = "Which bus stop would you like to know the schedule for";

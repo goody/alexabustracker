@@ -26,6 +26,10 @@ bad request ie bus stop name
   //TODO: node_module returns an obj if there's only one bus and an array if there're more than one 
   */
 function getStopSchedule(options) {
+    var responseText = {};
+    if(options.stopIds === false){
+        return responseText.error = 'I had trouble finding the bus stop.';
+    }
     return new Promise(function (resolve, reject) {
         busTracker.predictionsByStop(options, function (err, data) {
             if (err) {
@@ -38,6 +42,8 @@ function getStopSchedule(options) {
 
 /**
  * returns stop id from route number, direction, and stop by name
+ * Alexa sometimes returns lower case and CTA api requires Title Case for Direction
+ * also toLowerCase for comparing stops for same reason
  * 
  */
 function getRouteStop(options) {
@@ -58,9 +64,10 @@ function getRouteStop(options) {
             } else {
                 //filter results on cross street
                 var stop = _.filter(data, function (b) {
-                    return b.stpnm === busStopName.replace('and', '&');
+                    return b.stpnm.toLowerCase() === busStopName.replace('and', '&').toLowerCase();
                 });
-                result.stopIds = [stop[0].stpid];
+                //return false if no ids found
+                result.stopIds = [stop[0].stpid] || false;
                 resolve(result);
             }
         });
@@ -69,8 +76,8 @@ function getRouteStop(options) {
 
 function renderBusText(responseData) {
     var responseText = '';
-    if (responseData == null) {
-        responseText = 'There are no buses near.';
+    if (responseData.error == null) {
+        responseText = responseData.error;
     } else {
         if (Array.isArray(responseData)) {
             var howManyBuses = responseData.length;
@@ -121,7 +128,7 @@ function _toTitleCase(str)
 //     // topCount: 5
 //     BusRouteNumber: 22,
 //     RouteDirection: 'Northbound',
-//     BusStopName: 'Clark and Lawrence'
+//     BusStopName: 'Clark and lawrence'
 // };
 
 // // getStopSchedule(options).then(function(val){
