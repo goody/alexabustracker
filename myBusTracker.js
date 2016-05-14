@@ -93,9 +93,14 @@ function renderBusText(responseData) {
             var howManyBuses = busData.length;
             var busTimes = '';
             for (var i = 0; i < howManyBuses; i++) {
-                busTimes += _getArrivalTime(busData[i].prdtm).toString();
-                if (i < howManyBuses - 1) {
+                if (i === howManyBuses - 1) {
                     busTimes += ' and ';
+                }
+                
+                busTimes += _getArrivalTime(busData[i].prdtm).toString();
+                
+                if(i != howManyBuses - 1) {
+                    busTimes += ', '; //comma appended to slow down Alexa
                 }
             }
             responseText = 'The ' + busData[0].rtdir + ' ' + busData[0].rt + ' bus at ' + busData[0].stpnm + ' has ' + howManyBuses + ' buses arriving in ' + busTimes + ' minutes';
@@ -131,24 +136,24 @@ function _toTitleCase(str)
  * */
 
 //for local testing
-var options = {
-    // // // a list of up to 10 stop IDs 
-    // stopIds: [ "3766" ],
-    // // topCount is optional 
-    // topCount: 5
-    BusRouteNumber: 22,
-    RouteDirection: 'Northbound',
-    BusStopName: 'Clark and lawrence'
-};
+//var options = {
+//     // // // a list of up to 10 stop IDs 
+//     // stopIds: [ "3766" ],
+//     // // topCount is optional 
+//     // topCount: 5
+//     BusRouteNumber: 22,
+//     RouteDirection: 'Northbound',
+//     BusStopName: 'Clark and lawrence'
+// };
 
-// getStopSchedule(options).then(function(val){
-//    console.log(renderBusText(val)); 
+// // getStopSchedule(options).then(function(val){
+// //    console.log(renderBusText(val)); 
+// // });
+// getRouteStop(options)
+// .then(getStopSchedule)
+// .then(function(val){
+//     console.log(renderBusText(val));
 // });
-getRouteStop(options)
-.then(getStopSchedule)
-.then(function(val){
-    console.log(renderBusText(val));
-});
 
 // for local testing
 // getRouteSchedule(options).then(function(val){
