@@ -101,11 +101,11 @@ function getWelcomeResponse(callback) {
     // If we wanted to initialize the session to have some attributes we could add those here.
     var sessionAttributes = {};
     var cardTitle = "Welcome";
-    var speechOutput = "Welcome to the See Tee Ay Bus Tracker. " +
-        "Please tell me which bus stop you would like the schedule for.  For example, ask me,  when is the next bus at bus stop 3773";
+    var speechOutput = "Welcome to the Chicago Bus Stop skill. " +
+        "Please tell me which bus stop you would like the schedule for.  For example, ask me,  when is the next bus at stop 3773";
     // If the user either does not reply to the welcome message or says something that is not
     // understood, they will be prompted again with this text.
-    var repromptText = "Which bus stop would you like to know the schedule for";
+    var repromptText = "Which stop would you like to know the schedule for";
     var shouldEndSession = false;
 
     callback(sessionAttributes,
@@ -113,7 +113,7 @@ function getWelcomeResponse(callback) {
 }
 
 function getBusByStop(intent, session, callback) {
-    var cardTitle = "Getting Bus by Stop";
+    var cardTitle = "Getting Bus by Stop #";
     var repromptText = "";
     var shouldEndSession = false;
     var sessionAttributes = {};
@@ -136,7 +136,7 @@ function getBusByStop(intent, session, callback) {
 }
 
 function getBusByRoute(intent, session, callback) {
-    var cardTitle = "Getting Bus by Route";
+    var cardTitle = "Getting Bus by Direction, Route, and Stop Name/Cross Streets";
     var repromptText = "";
     var shouldEndSession = false;
     var sessionAttributes = {};
@@ -187,8 +187,8 @@ function buildSpeechletResponse(title, output, repromptText, shouldEndSession) {
         },
         card: {
             type: "Simple",
-            title: "SessionSpeechlet - " + title,
-            content: "SessionSpeechlet - " + output
+            title: title,
+            content: output
         },
         reprompt: {
             outputSpeech: {
