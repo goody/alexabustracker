@@ -59,7 +59,7 @@ function getRouteStop(options) {
     return new Promise(function (resolve, reject) {
         console.log('getRouteStop start.');
         var routeId = options.BusRouteNumber;
-        var routeDirection = _toTitleCase(options.RouteDirection);
+        var routeDirection = options.RouteDirection.toUpperCase();
         var busStopName = options.BusStopName;
 
         busTracker.stops(routeId, routeDirection, function (err, data) {
@@ -136,13 +136,13 @@ function _toTitleCase(str)
  * */
 
 //for local testing
-//var options = {
+// var options = {
 //     // // // a list of up to 10 stop IDs 
 //     // stopIds: [ "3766" ],
 //     // // topCount is optional 
 //     // topCount: 5
 //     BusRouteNumber: 22,
-//     RouteDirection: 'Northbound',
+//     RouteDirection: 'North',
 //     BusStopName: 'Clark and lawrence'
 // };
 
