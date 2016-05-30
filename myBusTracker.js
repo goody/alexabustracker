@@ -29,6 +29,7 @@ function getStopSchedule(options) {
     var response = {};
     if(options.stopIds === false){
         response.error = 'I had trouble finding that bus stop.';
+        response.repromptText = 'Which bus sotp would you like the schedule for?';
         return response;
     }
     return new Promise(function (resolve, reject) {
@@ -39,6 +40,7 @@ function getStopSchedule(options) {
             //bad stpid
             if(data == null){
                 response.error = 'I had trouble finding that bus stop';
+                response.repromptText = 'Which bus sotp would you like the schedule for?';
                 resolve(response);
             } else {
                 response.busData = data;
