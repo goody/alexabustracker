@@ -77,7 +77,7 @@ function onIntent(intentRequest, session, callback) {
     } else if ("BusByRouteIntent" === intentName) {
         getBusByRoute(intent, session, callback);
     } else if ("AMAZON.HelpIntent" === intentName) {
-        getWelcomeResponse(callback);
+        getHelp(callback);
     } else if ("AMAZON.StopIntent" === intentName || "AMAZON.CancelIntent" === intentName) {
         handleSessionEndRequest(callback);
     } else {
@@ -112,6 +112,21 @@ function getWelcomeResponse(callback) {
         buildSpeechletResponse(cardTitle, speechOutput, repromptText, shouldEndSession));
 }
 
+function getHelp(callback) {
+    // If we wanted to initialize the session to have some attributes we could add those here.
+    var sessionAttributes = {};
+    var cardTitle = "Help";
+    var speechOutput = "To get the schedule for a bus stop either ask for the next buses at that specific stop number, or, give the direction, route number, and cross streets," +
+        "For example, when are the next buses at stop number 3766, or, when is the next north bound twenty two bus at Clark and Addison.";
+    // If the user either does not reply to the welcome message or says something that is not
+    // understood, they will be prompted again with this text.
+    var repromptText = "Which stop would you like to know the schedule for";
+    var shouldEndSession = false;
+
+    callback(sessionAttributes,
+        buildSpeechletResponse(cardTitle, speechOutput, repromptText, shouldEndSession));
+}
+
 function getBusByStop(intent, session, callback) {
     var cardTitle = "Getting Bus by Stop #";
     var repromptText = "";
@@ -129,6 +144,9 @@ function getBusByStop(intent, session, callback) {
     var speechOutput = '';
     busTracker.getStopSchedule(options).then(function (results) {
         speechOutput = busTracker.renderBusText(results);
+        console.log(results);
+        //add logic to test success and return end sessions
+        shouldEndSession = results.error ? false : true;
         callback(sessionAttributes,
             buildSpeechletResponse(cardTitle, speechOutput, repromptText, shouldEndSession));
     });
@@ -158,6 +176,8 @@ function getBusByRoute(intent, session, callback) {
         .then(function (results) {
             console.log(results);
             speechOutput = busTracker.renderBusText(results);
+            //add logic to test success and return end sessions
+            shouldEndSession = false;
             callback(sessionAttributes,
                 buildSpeechletResponse(cardTitle, speechOutput, repromptText, shouldEndSession));
         });
