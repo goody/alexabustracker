@@ -3,6 +3,19 @@ BusByStopIntent stop {BusStopId}
 BusByStopIntent bus stop {BusStopId}
 BusByStopIntent {BusStopId}
 BusByRouteIntent when the next {RouteDirection} {BusRouteNumber} bus at {BusStopName}
+BusByRouteIntent when the next {RouteDirection} bound {BusRouteNumber} bus at {BusStopName}
+BusByRouteIntent when the next {RouteDirection} bound {BusRouteName} bus at {BusStopName}
 BusByRouteIntent when the next {RouteDirection} {BusRouteName} bus at {BusStopName}
 BusByRouteIntent when is the next {RouteDirection} {BusRouteNumber} bus at {BusStopName}
 BusByRouteIntent when is the next {RouteDirection} {BusRouteName} bus at {BusStopName}
+BusByRouteIntent when is the next {RouteDirection} bound {BusRouteNumber} bus at {BusStopName}
+BusByRouteIntent when is the next {RouteDirection} bound {BusRouteName} bus at {BusStopName}
+BusByRouteIntent when is the next {BusRouteNumber} bus headed {RouteDirection} bound at {BusStopName}
+BusByRouteIntent when is the next {BusRouteNumber} bus headed {RouteDirection} at {BusStopName}
+BusByRouteIntent when is the next {BusRouteName} bus headed {RouteDirection} bound at {BusStopName}
+BusByRouteIntent when is the next {BusRouteName} bus headed {RouteDirection} at {BusStopName}
+BusByRouteIntent when is the next {BusRouteNumber} bus at {BusStopName} headed {RouteDirection}
+BusByRouteIntent when is the next {BusRouteNumber} bus at {BusStopName} headed {RouteDirection} bound
+BusByRouteIntent when is the next {BusRouteName} bus at {BusStopName} headed {RouteDirection}
+BusByRouteIntent when is the next {BusRouteName} bus at {BusStopName} headed {RouteDirection} bound 
+StopIntent {StopWords}
