@@ -78,7 +78,7 @@ function onIntent(intentRequest, session, callback) {
         getBusByRoute(intent, session, callback);
     } else if ("AMAZON.HelpIntent" === intentName) {
         getHelp(callback);
-    } else if ("AMAZON.StopIntent" === intentName || "AMAZON.CancelIntent" === intentName) {
+    } else if ("AMAZON.StopIntent" === intentName || "AMAZON.CancelIntent" === intentName || "StopIntent" === intentName) {
         handleSessionEndRequest(callback);
     } else {
         throw "Invalid intent";
@@ -132,7 +132,7 @@ function getBusByStop(intent, session, callback) {
     var repromptText = "";
     var shouldEndSession = false;
     var sessionAttributes = {};
-    var busStop = intent.slots.BusStopId.value || 3766;
+    var busStop = intent.slots.BusStopId.value;
     console.log('REQUEST getBusByStop:');
     console.log('stp: ' + busStop);
     var options = {
@@ -147,6 +147,7 @@ function getBusByStop(intent, session, callback) {
         console.log(results);
         //add logic to test success and return end sessions
         shouldEndSession = results.error ? false : true;
+        repromptText = results.repromptText ? results.repromptText : '';
         callback(sessionAttributes,
             buildSpeechletResponse(cardTitle, speechOutput, repromptText, shouldEndSession));
     });
@@ -177,7 +178,8 @@ function getBusByRoute(intent, session, callback) {
             console.log(results);
             speechOutput = busTracker.renderBusText(results);
             //add logic to test success and return end sessions
-            shouldEndSession = false;
+            shouldEndSession = results.error ? false : true;
+            repromptText = results.repromptText ? results.repromptText : '';
             callback(sessionAttributes,
                 buildSpeechletResponse(cardTitle, speechOutput, repromptText, shouldEndSession));
         });
@@ -186,7 +188,7 @@ function getBusByRoute(intent, session, callback) {
 
 function handleSessionEndRequest(callback) {
     var cardTitle = "Session Ended";
-    var speechOutput = "Thank you for using the CTA Bus Tracker. Have a nice day!";
+    var speechOutput = "Thank you for using the Chicago Bus Stop Skill. Have a nice day!";
     // Setting this to true ends the session and exits the skill.
     var shouldEndSession = true;
 

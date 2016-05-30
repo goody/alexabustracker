@@ -75,8 +75,9 @@ function getRouteStop(options) {
                 var stop = _.filter(data, function (b) {
                     return b.stpnm.toLowerCase() === busStopName.replace('and', '&').toLowerCase();
                 });
+                
                 //return false if no ids found
-                result.stopIds = [stop[0].stpid] || false;
+                result.stopIds = stop.length > 0 ?  [stop[0].stpid] : false;
                 resolve(result);
             }
         });
@@ -141,8 +142,8 @@ function _toTitleCase(str)
 //     // stopIds: [ "3766" ],
 //     // // topCount is optional 
 //     // topCount: 5
-//     BusRouteNumber: 22,
-//     RouteDirection: 'North',
+//     BusRouteNumber: 81,
+//     RouteDirection: 'East',
 //     BusStopName: 'Clark and lawrence'
 // };
 
