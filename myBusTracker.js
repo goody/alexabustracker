@@ -61,7 +61,7 @@ function getRouteStop(options) {
     return new Promise(function (resolve, reject) {
         console.log('getRouteStop start.');
         var routeId = options.BusRouteNumber;
-        var routeDirection = options.RouteDirection.toUpperCase();
+        var routeDirection = options.RouteDirection.replace('bound', '').toUpperCase();
         var busStopName = options.BusStopName;
 
         busTracker.stops(routeId, routeDirection, function (err, data) {
@@ -106,9 +106,9 @@ function renderBusText(responseData) {
                     busTimes += ', '; //comma appended to slow down Alexa
                 }
             }
-            responseText = 'The ' + busData[0].rtdir + ' ' + busData[0].rt + ' bus at ' + busData[0].stpnm + ' has ' + howManyBuses + ' buses arriving in ' + busTimes + ' minutes';
+            responseText = 'The ' + busData[0].rtdir + ' bound ' + busData[0].rt + ' bus at ' + busData[0].stpnm + ' has ' + howManyBuses + ' buses arriving in ' + busTimes + ' minutes';
         } else {
-            responseText = 'The ' + busData.rtdir + ' ' + busData.rt + ' bus at ' + busData.stpnm + ' has one bus arriving in ' + _getArrivalTime(busData.prdtm) + ' minutes.';
+            responseText = 'The ' + busData.rtdir + ' bound ' + busData.rt + ' bus at ' + busData.stpnm + ' has one bus arriving in ' + _getArrivalTime(busData.prdtm) + ' minutes.';
         }
     }
     return responseText;
@@ -139,24 +139,24 @@ function _toTitleCase(str)
  * */
 
 //for local testing
-// var options = {
-//     // // // a list of up to 10 stop IDs 
-//     // stopIds: [ "3766" ],
-//     // // topCount is optional 
-//     // topCount: 5
-//     BusRouteNumber: 81,
-//     RouteDirection: 'East',
-//     BusStopName: 'Clark and lawrence'
-// };
+var options = {
+    // // // a list of up to 10 stop IDs 
+    // stopIds: [ "3766" ],
+    // // topCount is optional 
+    // topCount: 5
+    BusRouteNumber: 81,
+    RouteDirection: 'Eastbound',
+    BusStopName: 'Clark and lawrence'
+};
 
 // // getStopSchedule(options).then(function(val){
 // //    console.log(renderBusText(val)); 
 // // });
-// getRouteStop(options)
-// .then(getStopSchedule)
-// .then(function(val){
-//     console.log(renderBusText(val));
-// });
+getRouteStop(options)
+.then(getStopSchedule)
+.then(function(val){
+    console.log(renderBusText(val));
+});
 
 // for local testing
 // getRouteSchedule(options).then(function(val){
