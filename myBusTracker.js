@@ -27,8 +27,8 @@ bad request ie bus stop name
   */
 function getStopSchedule(options) {
     var response = {};
-    if(options.stopIds === false){
-        response.error = 'I had trouble finding that bus stop.';
+    if (options.stopIds === false) {
+        response.error = _errorText(options.byRoute);
         response.repromptText = 'Which bus stop would you like the schedule for?';
         return response;
     }
@@ -38,8 +38,8 @@ function getStopSchedule(options) {
                 console.log('err:', err);
             }
             //bad stpid
-            if(data == null){
-                response.error = 'I had trouble finding that bus stop';
+            if (data == null) {
+                response.error = _errorText(options.byRoute);
                 response.repromptText = 'Which bus stop would you like the schedule for?';
                 resolve(response);
             } else {
@@ -160,9 +160,18 @@ function _getArrivalTime(expectedTime){
     return arriving.toString();
 }
 
-function _toTitleCase(str)
-{
-    return str.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
+function _errorText(isRoute) {
+    var returnText = 'I had trouble finding that bus stop, ';
+    if (isRoute === true) {
+        returnText += 'please try again using the direction, bus route number, and stop name or cross streets.  For the most accurate results use the bus stop ID number';
+    } else {
+        returnText += 'please tell me the bus stop ID number for the stop you would like the schedule for';
+    }
+    return returnText;
+}
+
+function _toTitleCase(str) {
+    return str.replace(/\w\S*/g, function (txt) { return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase(); });
 }
 
 /***
