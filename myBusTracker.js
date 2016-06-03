@@ -60,28 +60,38 @@ function getStopSchedule(options) {
 function getRouteStop(options) {
     return new Promise(function (resolve, reject) {
         console.log('getRouteStop start.');
+        var responseObj = {};
+        if (options.error === true) {
+            responseObj.error = true;
+            reject(new Error('fail'));
+        }
         var userDirection = options.options.RouteDirection.substring(0,2);
         var routeId = options.options.BusRouteNumber;
+        var routeName = options.options.BusRouteName;
         var routeDirection = _.findIndex(options.routeDirections, function(o) { return o.substring(0,2).toLowerCase() === userDirection.toLowerCase(); });
         //var routeDirection = options.routeDirections.indexOf(userDirection)
         var busStopName = options.options.BusStopName;
 
-        busTracker.stops(routeId, options.routeDirections[routeDirection], function (err, data) {
+        busTracker.stops(routeId, routeDirection, function (err, data) {
             var result = {};
+            result.byRoute = true;
+            result.routeId = routeId;
+            result.routeDirection = routeDirection;
+            result.busStopName = busStopName;
             if (err) {
                 console.log('err', err);
             }
             if (data == null) {
-                result = null;
+                result.stopIds = false;
                 resolve(result);
             } else {
                 //filter results on cross street
                 var stop = _.filter(data, function (b) {
                     return b.stpnm.toLowerCase() === busStopName.replace('and', '&').toLowerCase();
                 });
-                
+
                 //return false if no ids found
-                result.stopIds = stop.length > 0 ?  [stop[0].stpid] : false;
+                result.stopIds = stop.length > 0 ? [stop[0].stpid] : false;
                 resolve(result);
             }
         });
@@ -98,22 +108,29 @@ function getRouteStop(options) {
 function getRouteDirections(options) {
     return new Promise(function (resolve, reject) {
         console.log('getRouteDirections start.');
+        var responseObj = {};
         var routeId = options.BusRouteNumber;
+        if (routeId == null) {
+            responseObj.error = true;
+            responseObj.routeNumber = false;
+            resolve(responseObj);
+        } 
 
         busTracker.routeDirections(routeId, function (err, data) {
-            var result = {};
             if (err) {
                 console.log('err', err);
             }
             if (data == null) {
-                result = null;
-                resolve(result);
+                //TODO: why result = null
+                //result = null;
+                responseObj.error = true;
+                resolve(responseObj);
             } else {
                 //return array of directions
-                result.routeDirections = data;
+                responseObj.routeDirections = data;
                 //pass along original params
-                result.options = options;
-                resolve(result);
+                responseObj.options = options;
+                resolve(responseObj);
             }
         });
     });
@@ -139,9 +156,9 @@ function renderBusText(responseData) {
                     busTimes += ', '; //comma appended to slow down Alexa
                 }
             }
-            responseText = 'The ' + busData[0].rtdir + ' bound ' + busData[0].rt + ' bus at ' + busData[0].stpnm + ' has ' + howManyBuses + ' buses arriving in ' + busTimes + ' minutes';
+            responseText = 'The ' + busData[0].rtdir + ' ' + busData[0].rt + ' bus at ' + busData[0].stpnm + ' has ' + howManyBuses + ' buses arriving in ' + busTimes + ' minutes';
         } else {
-            responseText = 'The ' + busData.rtdir + ' bound ' + busData.rt + ' bus at ' + busData.stpnm + ' has one bus arriving in ' + _getArrivalTime(busData.prdtm) + ' minutes.';
+            responseText = 'The ' + busData.rtdir + ' ' + busData.rt + ' bus at ' + busData.stpnm + ' has one bus arriving in ' + _getArrivalTime(busData.prdtm) + ' minutes.';
         }
     }
     return responseText;
@@ -181,26 +198,26 @@ function _toTitleCase(str) {
  * */
 
 //for local testing
-// var options = {
-//     // // // a list of up to 10 stop IDs 
-//     // stopIds: [ "3766" ],
-//     // // topCount is optional 
-//     // topCount: 5
-//     BusRouteNumber: 22,
-//     RouteDirection: 'Southbound',
-//     BusStopName: 'Clark and Lawrence'
-// };
+var options = {
+    // // // a list of up to 10 stop IDs 
+    // stopIds: [ "3766" ],
+    // // topCount is optional 
+    // topCount: 5
+    BusRouteNumber: null,
+    RouteDirection: 'Southbound',
+    BusStopName: 'Clark and Lawrence'
+};
 
 // getStopSchedule(options).then(function(val){
 //    console.log(renderBusText(val)); 
 // });
-// getRouteDirections(options)
-// .then(getRouteStop)
-// //getRouteStop(options)
-// .then(getStopSchedule)
-// .then(function(val){
-//     console.log(renderBusText(val));
-// });
+getRouteDirections(options)
+.then(getRouteStop)
+//getRouteStop(options)
+.then(getStopSchedule)
+.then(function(val){
+    console.log(renderBusText(val));
+});
 
 // for local testing
 // getRouteSchedule(options).then(function(val){
