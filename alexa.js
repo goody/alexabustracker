@@ -172,7 +172,9 @@ function getBusByRoute(intent, session, callback) {
         BusStopName: busStopName
     };
     var speechOutput = '';
-    busTracker.getRouteStop(options)
+    busTracker.getRouteDirections(options)
+        .then(busTracker.getRouteStop)
+    //busTracker.getRouteStop(options)
         .then(busTracker.getStopSchedule)
         .then(function (results) {
             console.log(results);

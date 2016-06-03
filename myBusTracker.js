@@ -60,11 +60,13 @@ function getStopSchedule(options) {
 function getRouteStop(options) {
     return new Promise(function (resolve, reject) {
         console.log('getRouteStop start.');
-        var routeId = options.BusRouteNumber;
-        var routeDirection = options.RouteDirection.replace('bound', '').toUpperCase();
-        var busStopName = options.BusStopName;
+        var userDirection = options.options.RouteDirection.substring(0,2);
+        var routeId = options.options.BusRouteNumber;
+        var routeDirection = _.findIndex(options.routeDirections, function(o) { return o.substring(0,2).toLowerCase() === userDirection.toLowerCase(); });
+        //var routeDirection = options.routeDirections.indexOf(userDirection)
+        var busStopName = options.options.BusStopName;
 
-        busTracker.stops(routeId, routeDirection, function (err, data) {
+        busTracker.stops(routeId, options.routeDirections[routeDirection], function (err, data) {
             var result = {};
             if (err) {
                 console.log('err', err);
@@ -80,6 +82,37 @@ function getRouteStop(options) {
                 
                 //return false if no ids found
                 result.stopIds = stop.length > 0 ?  [stop[0].stpid] : false;
+                resolve(result);
+            }
+        });
+    });
+}
+
+
+/**
+ * returns stop id from route number, direction, and stop by name
+ * Alexa sometimes returns lower case and CTA api requires Title Case for Direction
+ * also toLowerCase for comparing stops for same reason
+ * 
+ */
+function getRouteDirections(options) {
+    return new Promise(function (resolve, reject) {
+        console.log('getRouteDirections start.');
+        var routeId = options.BusRouteNumber;
+
+        busTracker.routeDirections(routeId, function (err, data) {
+            var result = {};
+            if (err) {
+                console.log('err', err);
+            }
+            if (data == null) {
+                result = null;
+                resolve(result);
+            } else {
+                //return array of directions
+                result.routeDirections = data;
+                //pass along original params
+                result.options = options;
                 resolve(result);
             }
         });
@@ -139,24 +172,26 @@ function _toTitleCase(str)
  * */
 
 //for local testing
-var options = {
-    // // // a list of up to 10 stop IDs 
-    // stopIds: [ "3766" ],
-    // // topCount is optional 
-    // topCount: 5
-    BusRouteNumber: 81,
-    RouteDirection: 'Eastbound',
-    BusStopName: 'Clark and lawrence'
-};
+// var options = {
+//     // // // a list of up to 10 stop IDs 
+//     // stopIds: [ "3766" ],
+//     // // topCount is optional 
+//     // topCount: 5
+//     BusRouteNumber: 22,
+//     RouteDirection: 'Southbound',
+//     BusStopName: 'Clark and Lawrence'
+// };
 
-// // getStopSchedule(options).then(function(val){
-// //    console.log(renderBusText(val)); 
-// // });
-getRouteStop(options)
-.then(getStopSchedule)
-.then(function(val){
-    console.log(renderBusText(val));
-});
+// getStopSchedule(options).then(function(val){
+//    console.log(renderBusText(val)); 
+// });
+// getRouteDirections(options)
+// .then(getRouteStop)
+// //getRouteStop(options)
+// .then(getStopSchedule)
+// .then(function(val){
+//     console.log(renderBusText(val));
+// });
 
 // for local testing
 // getRouteSchedule(options).then(function(val){
@@ -167,6 +202,7 @@ getRouteStop(options)
 // });
 
 module.exports = {
+    getRouteDirections : getRouteDirections,
     getStopSchedule : getStopSchedule,
     getRouteStop : getRouteStop,
     renderBusText: renderBusText
