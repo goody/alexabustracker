@@ -19,16 +19,16 @@ bad request ie bus stop name
  * public functions
  * 
  */
- 
- /**
-  * 
-  returns stop obj with buses approaching
-  //TODO: node_module returns an obj if there's only one bus and an array if there're more than one 
-  */
+
+/**
+ * 
+ returns stop obj with buses approaching
+ //TODO: node_module returns an obj if there's only one bus and an array if there're more than one 
+ */
 function getStopSchedule(options) {
     var response = {};
-    if(options.stopIds === false){
-        response.error = 'I had trouble finding that bus stop.';
+    if (options.stopIds === false) {
+        response.error = _errorText(options.byRoute);
         response.repromptText = 'Which bus stop would you like the schedule for?';
         return response;
     }
@@ -38,15 +38,15 @@ function getStopSchedule(options) {
                 console.log('err:', err);
             }
             //bad stpid
-            if(data == null){
-                response.error = 'I had trouble finding that bus stop';
+            if (data == null) {
+                response.error = _errorText(options.byRoute);
                 response.repromptText = 'Which bus stop would you like the schedule for?';
                 resolve(response);
             } else {
                 response.busData = data;
                 resolve(response);
             }
-            
+
         });
     });
 }
@@ -66,20 +66,24 @@ function getRouteStop(options) {
 
         busTracker.stops(routeId, routeDirection, function (err, data) {
             var result = {};
+            result.byRoute = true;
+            result.routeId = routeId;
+            result.routeDirection = routeDirection;
+            result.busStopName = busStopName;
             if (err) {
                 console.log('err', err);
             }
             if (data == null) {
-                result = null;
+                result.stopIds = false;
                 resolve(result);
             } else {
                 //filter results on cross street
                 var stop = _.filter(data, function (b) {
                     return b.stpnm.toLowerCase() === busStopName.replace('and', '&').toLowerCase();
                 });
-                
+
                 //return false if no ids found
-                result.stopIds = stop.length > 0 ?  [stop[0].stpid] : false;
+                result.stopIds = stop.length > 0 ? [stop[0].stpid] : false;
                 resolve(result);
             }
         });
@@ -99,10 +103,10 @@ function renderBusText(responseData) {
                 if (i === howManyBuses - 1) {
                     busTimes += ' and ';
                 }
-                
+
                 busTimes += _getArrivalTime(busData[i].prdtm).toString();
-                
-                if(i != howManyBuses - 1) {
+
+                if (i != howManyBuses - 1) {
                     busTimes += ', '; //comma appended to slow down Alexa
                 }
             }
@@ -120,16 +124,25 @@ function renderBusText(responseData) {
  * 
  */
 
-function _getArrivalTime(expectedTime){
+function _getArrivalTime(expectedTime) {
     var expected = moment(expectedTime).tz("America/Chicago").format();
     var current = moment().tz("America/Chicago").format();
-    var arriving = moment(expected).diff(current,'minutes');
+    var arriving = moment(expected).diff(current, 'minutes');
     return arriving.toString();
 }
 
-function _toTitleCase(str)
-{
-    return str.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
+function _errorText(isRoute) {
+    var returnText = 'I had trouble finding that bus stop, ';
+    if (isRoute === true) {
+        returnText += 'please try again using the direction, bus route number, and stop name or cross streets.  For the most accurate results use the bus stop ID number';
+    } else {
+        returnText += 'please tell me the bus stop ID number for the stop you would like the schedule for';
+    }
+    return returnText;
+}
+
+function _toTitleCase(str) {
+    return str.replace(/\w\S*/g, function (txt) { return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase(); });
 }
 
 /***
@@ -139,24 +152,24 @@ function _toTitleCase(str)
  * */
 
 //for local testing
-var options = {
-    // // // a list of up to 10 stop IDs 
-    // stopIds: [ "3766" ],
-    // // topCount is optional 
-    // topCount: 5
-    BusRouteNumber: 81,
-    RouteDirection: 'Eastbound',
-    BusStopName: 'Clark and lawrence'
-};
+// var options = {
+//     // // // a list of up to 10 stop IDs 
+//     // stopIds: [ "3766" ],
+//     // // topCount is optional 
+//     // topCount: 5
+//     BusRouteNumber: 3,
+//     RouteDirection: 'Eastbound',
+//     BusStopName: 'Harrison'
+// };
 
 // // getStopSchedule(options).then(function(val){
 // //    console.log(renderBusText(val)); 
 // // });
-getRouteStop(options)
-.then(getStopSchedule)
-.then(function(val){
-    console.log(renderBusText(val));
-});
+// getRouteStop(options)
+//     .then(getStopSchedule)
+//     .then(function (val) {
+//         console.log(renderBusText(val));
+//     });
 
 // for local testing
 // getRouteSchedule(options).then(function(val){
@@ -167,7 +180,7 @@ getRouteStop(options)
 // });
 
 module.exports = {
-    getStopSchedule : getStopSchedule,
-    getRouteStop : getRouteStop,
+    getStopSchedule: getStopSchedule,
+    getRouteStop: getRouteStop,
     renderBusText: renderBusText
 }
