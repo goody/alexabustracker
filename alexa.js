@@ -143,16 +143,8 @@ function getBusByStop(intent, session, callback) {
     };
     var speechOutput = '';
     busTracker.getStopSchedule(options)
+        .catch(busTracker.errorHandler)
         .then(function (results) {
-            speechOutput = busTracker.renderBusText(results);
-            console.log(results);
-            //add logic to test success and return end sessions
-            shouldEndSession = results.isError ? false : true;
-            repromptText = results.repromptText ? results.repromptText : '';
-            callback(sessionAttributes,
-                buildSpeechletResponse(cardTitle, speechOutput, repromptText, shouldEndSession));
-        })
-        .catch(function (results) {
             speechOutput = busTracker.renderBusText(results);
             console.log(results);
             //add logic to test success and return end sessions
@@ -185,6 +177,7 @@ function getBusByRoute(intent, session, callback) {
     busTracker.getRouteDirections(options)
         .then(busTracker.getRouteStop)
         .then(busTracker.getStopSchedule)
+        .catch(busTracker.errorHandler)
         .then(function (results) {
             console.log(results);
             speechOutput = busTracker.renderBusText(results);
@@ -193,17 +186,7 @@ function getBusByRoute(intent, session, callback) {
             repromptText = results.repromptText ? results.repromptText : '';
             callback(sessionAttributes,
                 buildSpeechletResponse(cardTitle, speechOutput, repromptText, shouldEndSession));
-        })
-        .catch(function (results) {
-            console.log(results);
-            speechOutput = busTracker.renderBusText(results);
-            //add logic to test success and return end sessions
-            shouldEndSession = results.isError ? false : true;
-            repromptText = results.repromptText ? results.repromptText : '';
-            callback(sessionAttributes,
-                buildSpeechletResponse(cardTitle, speechOutput, repromptText, shouldEndSession));
         });
-
 }
 
 function handleSessionEndRequest(callback) {

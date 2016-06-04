@@ -176,7 +176,7 @@ function _getArrivalTime(expectedTime){
 }
 
 function _errorText(errorType) {
-    var returnText = 'I had trouble retreiving the bus schedule, ';
+    var returnText = 'I had trouble retrieving the bus schedule, ';
     switch (errorType) {
         case 'routeError':
             returnText += 'please try again using the direction, bus route number, and stop name or cross streets.  For the most accurate results use the bus stop ID number';
@@ -201,10 +201,10 @@ function _toTitleCase(str) {
     return str.replace(/\w\S*/g, function (txt) { return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase(); });
 }
 
-function _errorHandler(error) {
+function errorHandler(error) {
     error.isError = true;
     error.errorMessage = _errorText(error.errorType);
-    error.responseText = 'Which bus stop would you like the schedule for?';
+    error.repromptText = 'Which bus stop would you like the schedule for?';
     console.log(error);
     return error;
 }
@@ -216,28 +216,28 @@ function _errorHandler(error) {
  * */
 
 //for local testing
-var options = {
-    // // // a list of up to 10 stop IDs 
-    // stopIds: [ "3766" ],
-    // // topCount is optional 
-    // topCount: 5
-    BusRouteNumber: 81,
-    RouteDirection: 'East',
-    BusStopName: 'Lawrence'
-};
+// var options = {
+//     // // // a list of up to 10 stop IDs 
+//     // stopIds: [ "3766" ],
+//     // // topCount is optional 
+//     // topCount: 5
+//     BusRouteNumber: 81,
+//     RouteDirection: 'East',
+//     BusStopName: 'Lawrence'
+// };
 
 // getStopSchedule(options).then(function(val){
 //    console.log(renderBusText(val)); 
 // });
-getRouteDirections(options)
-.then(getRouteStop)
-//getRouteStop(options)
-.then(getStopSchedule)
-.then(function(val){
-    console.log(renderBusText(val));
-})
-.catch(_errorHandler)
-.then(renderBusText);
+// getRouteDirections(options)
+// .then(getRouteStop)
+// //getRouteStop(options)
+// .then(getStopSchedule)
+// .then(function(val){
+//     console.log(renderBusText(val));
+// })
+// .catch(_errorHandler)
+// .then(renderBusText);
 
 // for local testing
 // getRouteSchedule(options).then(function(val){
@@ -251,5 +251,6 @@ module.exports = {
     getRouteDirections : getRouteDirections,
     getStopSchedule : getStopSchedule,
     getRouteStop : getRouteStop,
-    renderBusText: renderBusText
+    renderBusText : renderBusText,
+    errorHandler : errorHandler
 }
