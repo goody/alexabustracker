@@ -77,7 +77,7 @@ function getRouteStop(options) {
                 //return false and reject if no ids found
                 result.stopIds = stop.length > 0 ? [stop[0].stpid] : false;
                 if(result.stopIds === false) {
-                    options.errorType = 'routeError';
+                    options.errorType = 'crossStreetError';
                     reject(options);
                 }
                 resolve(result);
@@ -175,19 +175,22 @@ function _errorText(errorType) {
     var returnText = 'I had trouble retrieving the bus schedule, ';
     switch (errorType) {
         case 'routeError':
-            returnText += 'please try again using the direction, bus route number, and stop name or cross streets.  For the most accurate results use the bus stop ID number';
+            returnText += 'please try again using the direction, bus route number, and cross streets.  For the most accurate results use the bus stop ID number';
             break;
-           case 'stopError':
+        case 'crossStreetError':
+            returnText += 'I had trouble matching that cross street or stop name to the bus route. Please, try again using the direction, route number, and cross streets.  For the most accurate results use the bus stop ID number';
+            break;          
+        case 'stopError':
             returnText += 'please tell me the bus stop ID number for the stop you would like the schedule for';
             break; 
-           case 'routeNumberInvalid':
+        case 'routeNumberInvalid':
             returnText += 'that bus route number returned no results. Please double check the route number.';
             break; 
-           case 'routeNumberNull':
+        case 'routeNumberNull':
             returnText += 'I did not catch that route number.  Please specify the bus route number when requesting a bus schedule by direction, route number, and cross streets.';
             break;                         
         default:
-        returnText += 'this is the default error';
+            returnText += 'please try again using the direction, bus route number, and cross streets.  For the most accurate results use the bus stop ID number';
             break;
     }
     return returnText;
