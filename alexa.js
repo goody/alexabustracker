@@ -142,15 +142,25 @@ function getBusByStop(intent, session, callback) {
         topCount: 5
     };
     var speechOutput = '';
-    busTracker.getStopSchedule(options).then(function (results) {
-        speechOutput = busTracker.renderBusText(results);
-        console.log(results);
-        //add logic to test success and return end sessions
-        shouldEndSession = results.error ? false : true;
-        repromptText = results.repromptText ? results.repromptText : '';
-        callback(sessionAttributes,
-            buildSpeechletResponse(cardTitle, speechOutput, repromptText, shouldEndSession));
-    });
+    busTracker.getStopSchedule(options)
+        .then(function (results) {
+            speechOutput = busTracker.renderBusText(results);
+            console.log(results);
+            //add logic to test success and return end sessions
+            shouldEndSession = results.isError ? false : true;
+            repromptText = results.repromptText ? results.repromptText : '';
+            callback(sessionAttributes,
+                buildSpeechletResponse(cardTitle, speechOutput, repromptText, shouldEndSession));
+        })
+        .catch(function (results) {
+            speechOutput = busTracker.renderBusText(results);
+            console.log(results);
+            //add logic to test success and return end sessions
+            shouldEndSession = results.isError ? false : true;
+            repromptText = results.repromptText ? results.repromptText : '';
+            callback(sessionAttributes,
+                buildSpeechletResponse(cardTitle, speechOutput, repromptText, shouldEndSession));
+        });
 
 }
 
@@ -174,13 +184,21 @@ function getBusByRoute(intent, session, callback) {
     var speechOutput = '';
     busTracker.getRouteDirections(options)
         .then(busTracker.getRouteStop)
-    //busTracker.getRouteStop(options)
         .then(busTracker.getStopSchedule)
         .then(function (results) {
             console.log(results);
             speechOutput = busTracker.renderBusText(results);
             //add logic to test success and return end sessions
-            shouldEndSession = results.error ? false : true;
+            shouldEndSession = results.isError ? false : true;
+            repromptText = results.repromptText ? results.repromptText : '';
+            callback(sessionAttributes,
+                buildSpeechletResponse(cardTitle, speechOutput, repromptText, shouldEndSession));
+        })
+        .catch(function (results) {
+            console.log(results);
+            speechOutput = busTracker.renderBusText(results);
+            //add logic to test success and return end sessions
+            shouldEndSession = results.isError ? false : true;
             repromptText = results.repromptText ? results.repromptText : '';
             callback(sessionAttributes,
                 buildSpeechletResponse(cardTitle, speechOutput, repromptText, shouldEndSession));

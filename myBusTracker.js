@@ -27,21 +27,18 @@ bad request ie bus stop name
   */
 function getStopSchedule(options) {
     var response = {};
-    if (options.stopIds === false) {
-        response.error = _errorText(options.byRoute);
-        response.repromptText = 'Which bus stop would you like the schedule for?';
-        return response;
-    }
+
     return new Promise(function (resolve, reject) {
         busTracker.predictionsByStop(options, function (err, data) {
             if (err) {
                 console.log('err:', err);
+                response.errorType = 'default';
+                reject(response);
             }
             //bad stpid
             if (data == null) {
-                response.error = _errorText(options.byRoute);
-                response.repromptText = 'Which bus stop would you like the schedule for?';
-                resolve(response);
+                response.errorType = 'stopError';
+                reject(response);
             } else {
                 response.busData = data;
                 resolve(response);
@@ -61,10 +58,6 @@ function getRouteStop(options) {
     return new Promise(function (resolve, reject) {
         console.log('getRouteStop start.');
         var responseObj = {};
-        if (options.error === true) {
-            responseObj.error = true;
-            reject(new Error('fail'));
-        }
         var userDirection = options.options.RouteDirection.substring(0,2);
         var routeId = options.options.BusRouteNumber;
         var routeName = options.options.BusRouteName;
@@ -72,7 +65,7 @@ function getRouteStop(options) {
         //var routeDirection = options.routeDirections.indexOf(userDirection)
         var busStopName = options.options.BusStopName;
 
-        busTracker.stops(routeId, routeDirection, function (err, data) {
+        busTracker.stops(routeId, options.routeDirections[routeDirection], function (err, data) {
             var result = {};
             result.byRoute = true;
             result.routeId = routeId;
@@ -80,18 +73,24 @@ function getRouteStop(options) {
             result.busStopName = busStopName;
             if (err) {
                 console.log('err', err);
+                response.errorType = 'default';
+                reject(response);
             }
             if (data == null) {
-                result.stopIds = false;
-                resolve(result);
+                options.errorType = 'routeError';
+                reject(options);
             } else {
                 //filter results on cross street
                 var stop = _.filter(data, function (b) {
                     return b.stpnm.toLowerCase() === busStopName.replace('and', '&').toLowerCase();
                 });
 
-                //return false if no ids found
+                //return false and reject if no ids found
                 result.stopIds = stop.length > 0 ? [stop[0].stpid] : false;
+                if(result.stopIds === false) {
+                    options.errorType = 'routeError';
+                    reject(options);
+                }
                 resolve(result);
             }
         });
@@ -110,21 +109,19 @@ function getRouteDirections(options) {
         console.log('getRouteDirections start.');
         var responseObj = {};
         var routeId = options.BusRouteNumber;
-        if (routeId == null) {
-            responseObj.error = true;
-            responseObj.routeNumber = false;
-            resolve(responseObj);
+        if (routeId == null || routeId === '') {
+            options.errorType = 'routeNumberNull';
+            reject(options);
         } 
 
         busTracker.routeDirections(routeId, function (err, data) {
             if (err) {
-                console.log('err', err);
+                console.dir('err', err);
             }
             if (data == null) {
                 //TODO: why result = null
-                //result = null;
-                responseObj.error = true;
-                resolve(responseObj);
+                options.errorType = 'routeNumberInvalid';
+                reject(options);
             } else {
                 //return array of directions
                 responseObj.routeDirections = data;
@@ -138,8 +135,8 @@ function getRouteDirections(options) {
 
 function renderBusText(responseData) {
     var responseText = '';
-    if (responseData.error != null) {
-        responseText = responseData.error;
+    if (responseData.isError != null) {
+        responseText = responseData.errorMessage;
     } else {
         var busData = responseData.busData;
         if (Array.isArray(busData)) {
@@ -161,6 +158,7 @@ function renderBusText(responseData) {
             responseText = 'The ' + busData.rtdir + ' ' + busData.rt + ' bus at ' + busData.stpnm + ' has one bus arriving in ' + _getArrivalTime(busData.prdtm) + ' minutes.';
         }
     }
+    console.log(responseText);
     return responseText;
 }
 
@@ -177,18 +175,38 @@ function _getArrivalTime(expectedTime){
     return arriving.toString();
 }
 
-function _errorText(isRoute) {
-    var returnText = 'I had trouble finding that bus stop, ';
-    if (isRoute === true) {
-        returnText += 'please try again using the direction, bus route number, and stop name or cross streets.  For the most accurate results use the bus stop ID number';
-    } else {
-        returnText += 'please tell me the bus stop ID number for the stop you would like the schedule for';
+function _errorText(errorType) {
+    var returnText = 'I had trouble retreiving the bus schedule, ';
+    switch (errorType) {
+        case 'routeError':
+            returnText += 'please try again using the direction, bus route number, and stop name or cross streets.  For the most accurate results use the bus stop ID number';
+            break;
+           case 'stopError':
+            returnText += 'please tell me the bus stop ID number for the stop you would like the schedule for';
+            break; 
+           case 'routeNumberInvalid':
+            returnText += 'that bus route number returned no results. Please double check the route number.';
+            break; 
+           case 'routeNumberNull':
+            returnText += 'I did not catch that route number.  Please specify the bus route number when requesting a bus schedule by direction, route number, and cross streets.';
+            break;                         
+        default:
+        returnText += 'this is the default error';
+            break;
     }
     return returnText;
 }
 
 function _toTitleCase(str) {
     return str.replace(/\w\S*/g, function (txt) { return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase(); });
+}
+
+function _errorHandler(error) {
+    error.isError = true;
+    error.errorMessage = _errorText(error.errorType);
+    error.responseText = 'Which bus stop would you like the schedule for?';
+    console.log(error);
+    return error;
 }
 
 /***
@@ -203,9 +221,9 @@ var options = {
     // stopIds: [ "3766" ],
     // // topCount is optional 
     // topCount: 5
-    BusRouteNumber: null,
-    RouteDirection: 'Southbound',
-    BusStopName: 'Clark and Lawrence'
+    BusRouteNumber: 81,
+    RouteDirection: 'East',
+    BusStopName: 'Lawrence'
 };
 
 // getStopSchedule(options).then(function(val){
@@ -217,7 +235,9 @@ getRouteDirections(options)
 .then(getStopSchedule)
 .then(function(val){
     console.log(renderBusText(val));
-});
+})
+.catch(_errorHandler)
+.then(renderBusText);
 
 // for local testing
 // getRouteSchedule(options).then(function(val){
