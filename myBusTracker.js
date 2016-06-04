@@ -178,7 +178,7 @@ function _errorText(errorType) {
             returnText += 'please try again using the direction, bus route number, and cross streets.  For the most accurate results use the bus stop ID number';
             break;
         case 'crossStreetError':
-            returnText += 'I had trouble matching that cross street or stop name to the bus route. Please, try again using the direction, route number, and cross streets.  For the most accurate results use the bus stop ID number';
+            returnText += 'the cross street or stop name were not listed on the bus route. Please, try again using the direction, route number, and cross streets.  For the most accurate results use the bus stop ID number';
             break;          
         case 'stopError':
             returnText += 'please tell me the bus stop ID number for the stop you would like the schedule for';
