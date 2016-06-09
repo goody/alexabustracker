@@ -3,6 +3,7 @@ var cta = require('cta-bus-tracker');
 var busTracker = cta(process.env.API_KEY);
 var moment = require('moment-timezone');
 var _ = require('lodash');
+var routeObj = require('./tool_output/ROUTES.json');
 
 /**
  * 
@@ -81,6 +82,47 @@ function getRouteStop(options) {
                     reject(options);
                 }
                 resolve(result);
+            }
+        });
+    });
+}
+
+/**
+ * returns the route number from the route name
+ * Alexa sometimes returns lower case and CTA api requires Title Case
+ * so toLowerCase for comparing
+ * 
+ */
+function getRouteNumber(options) {
+    return new Promise(function (resolve, reject) {
+        console.log('getRouteNumber start.');
+        var responseObj = {};
+        var routeName = options.BusRouteName;
+        if (routeName == null || routeName === '') {
+            options.errorType = 'routeNameNull';
+            reject(options);
+        } 
+
+        busTracker.routes(function (err, data) {
+            if (err) {
+                console.dir('err', err);
+            }
+            if (data == null) {
+                //TODO: why result = null
+                options.errorType = 'routeNameError';
+                reject(options);
+            } else {
+                var routeNumber = _.filter(data, function (r) {
+                    return r.rtnm.toLowerCase() === routeName.replace('/', 'and').toLowerCase();
+                });
+                if(routeNumber == null || routeNumber === {}){
+                    options.errorType = 'routeNameError';
+                    reject(options);                    
+                }
+                responseObj.routeNumber = routeNumber;
+                //pass along original params
+                responseObj.options = options;
+                resolve(responseObj);
             }
         });
     });
@@ -188,7 +230,13 @@ function _errorText(errorType) {
             break; 
         case 'routeNumberNull':
             returnText += 'I did not catch that route number.  Please specify the bus route number when requesting a bus schedule by direction, route number, and cross streets.';
-            break;                         
+            break;      
+        case 'routeNameNull':
+            returnText += 'please tell me the name of the bus route.  You can use either the number or the name.';
+            break;    
+        case 'routeNameError':
+            returnText += 'I did not find any results for that route name.  Please double check the route name and try again.';
+            break;                                             
         default:
             returnText += 'please try again using the direction, bus route number, and cross streets.  For the most accurate results use the bus stop ID number';
             break;
@@ -203,19 +251,26 @@ function _errorText(errorType) {
  * */
 
 //for local testing
-// var options = {
-//     // // // a list of up to 10 stop IDs 
-//     // stopIds: [ "3766" ],
-//     // // topCount is optional 
-//     // topCount: 5
-//     BusRouteNumber: 81,
-//     RouteDirection: 'East',
-//     BusStopName: 'Lawrence'
-// };
+var options = {
+    // // // a list of up to 10 stop IDs 
+    // stopIds: [ "3766" ],
+    // // topCount is optional 
+    // topCount: 5
+    BusRouteNumber: 81,
+    RouteDirection: 'East',
+    BusStopName: 'Lawrence',
+    BusRouteName: 'Lawrence'
+};
 
 // getStopSchedule(options).then(function(val){
 //    console.log(renderBusText(val)); 
 // });
+
+getRouteNumber(options)
+.then(function(val){
+    console.log(val);
+});
+
 // getRouteDirections(options)
 // .then(getRouteStop)
 // //getRouteStop(options)
@@ -233,6 +288,11 @@ function _errorText(errorType) {
 // .catch(function(err){
 //     console.log('err: ', err);
 // });
+
+// var stop = _.filter(routeObj, function (r) {
+//     return r.rtnm.toLowerCase() === 'hyde park express';
+// });
+// console.log(stop);
 
 module.exports = {
     getRouteDirections : getRouteDirections,

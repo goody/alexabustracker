@@ -13,11 +13,15 @@ var _ = require('lodash');
 var fs = require('fs');
 var _TOOLS = 'tool_output/';
 
+var routeObj = require('./tool_output/ROUTES.json');
+
+console.log(routeObj);
+
 /*
 fire off tools
 */
 
-getRoutesJSON();
+//getRoutesJSON();
 //getRoutes();
 //getAllStops();
 //_getRoutes();
