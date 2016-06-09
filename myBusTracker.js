@@ -16,21 +16,20 @@ var _ = require('lodash');
  //TODO: node_module returns an obj if there's only one bus and an array if there're more than one 
  */
 function getStopSchedule(options) {
-    var response = {};
     return new Promise(function (resolve, reject) {
         busTracker.predictionsByStop(options, function (err, data) {
             if (err) {
                 console.log('err:', err);
-                response.errorType = 'default';
-                reject(response);
+                options.errorType = 'default';
+                reject(options);
             }
             //bad stpid
             if (data == null) {
-                response.errorType = 'stopError';
-                reject(response);
+                options.errorType = 'stopError';
+                reject(options);
             } else {
-                response.busData = data;
-                resolve(response);
+                options.busData = data;
+                resolve(options);
             }
 
         });
@@ -46,7 +45,6 @@ function getStopSchedule(options) {
 function getRouteStop(options) {
     return new Promise(function (resolve, reject) {
         console.log('getRouteStop start.');
-        var responseObj = {};
         var userDirection = options.RouteDirection.substring(0, 2);
         var routeId = options.BusRouteNumber;
         var routeName = options.BusRouteName;
@@ -62,8 +60,8 @@ function getRouteStop(options) {
             result.busStopName = busStopName;
             if (err) {
                 console.log('err', err);
-                response.errorType = 'default';
-                reject(response);
+                options.errorType = 'default';
+                reject(options);
             }
             if (data == null) {
                 options.errorType = 'routeError';
@@ -108,7 +106,9 @@ function getRouteNumber(options) {
 
             busTracker.routes(function (err, data) {
                 if (err) {
-                    console.dir('err', err);
+                    console.log('err', err);
+                    options.errorType = 'default';
+                    reject(options);
                 }
                 if (data == null) {
                     //TODO: why result = null
@@ -148,7 +148,9 @@ function getRouteDirections(options) {
 
         busTracker.routeDirections(routeId, function (err, data) {
             if (err) {
-                console.dir('err', err);
+                console.log('err', err);
+                options.errorType = 'default';
+                reject(options);                
             }
             if (data == null) {
                 //TODO: why result = null
