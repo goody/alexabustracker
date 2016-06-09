@@ -3,7 +3,6 @@ var cta = require('cta-bus-tracker');
 var busTracker = cta(process.env.API_KEY);
 var moment = require('moment-timezone');
 var _ = require('lodash');
-var routeObj = require('./tool_output/ROUTES.json');
 
 /**
  * 
