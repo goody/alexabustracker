@@ -17,6 +17,7 @@ var _TOOLS = 'tool_output/';
 fire off tools
 */
 
+getRoutesJSON();
 //getRoutes();
 //getAllStops();
 //_getRoutes();
@@ -105,6 +106,24 @@ function getRoutes() {
     });
 }
 
+/*
+creates ROUTES.json
+*/
+function getRoutesJSON() {
+    busTracker.routes(function (err, data) {
+        if (err) {
+            console.log('error getting routes', err);
+        }
+        var leJSON = JSON.stringify(data);
+        fs.writeFile(_TOOLS + 'ROUTES.json', leJSON, function (err) {
+            if (err) {
+                console.log('file error: ', err);
+            } else {
+                console.log('ROUTEs JSON file written');
+            }
+        });
+    });
+}
 
 /*
 Internal Funcs
