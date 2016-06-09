@@ -47,10 +47,10 @@ function getRouteStop(options) {
     return new Promise(function (resolve, reject) {
         console.log('getRouteStop start.');
         var responseObj = {};
-        var userDirection = options.RouteDirection.substring(0,2);
+        var userDirection = options.RouteDirection.substring(0, 2);
         var routeId = options.BusRouteNumber;
         var routeName = options.BusRouteName;
-        var routeDirection = _.findIndex(options.routeDirections, function(o) { return o.substring(0,2).toLowerCase() === userDirection.toLowerCase(); });
+        var routeDirection = _.findIndex(options.routeDirections, function (o) { return o.substring(0, 2).toLowerCase() === userDirection.toLowerCase(); });
         //var routeDirection = options.routeDirections.indexOf(userDirection)
         var busStopName = options.BusStopName;
 
@@ -76,7 +76,7 @@ function getRouteStop(options) {
 
                 //return false and reject if no ids found
                 result.stopIds = stop.length > 0 ? [stop[0].stpid] : false;
-                if(result.stopIds === false) {
+                if (result.stopIds === false) {
                     options.errorType = 'crossStreetError';
                     reject(options);
                 }
@@ -96,36 +96,38 @@ function getRouteNumber(options) {
     return new Promise(function (resolve, reject) {
         console.log('getRouteNumber start.');
         //if we already have the route number
-        if(options.busRouteNumber != null || options.busRouteNumber != ''){
+        if (options.BusRouteNumber != undefined && options.BusRouteNumber != null && options.BusRouteNumber != '') {
             console.log('already had route #');
             resolve(options);
-        }
-        var routeName = options.BusRouteName;
-        if (routeName == null || routeName === '') {
-            options.errorType = 'routeNameNull';
-            reject(options);
-        } 
-
-        busTracker.routes(function (err, data) {
-            if (err) {
-                console.dir('err', err);
-            }
-            if (data == null) {
-                //TODO: why result = null
-                options.errorType = 'routeNameError';
+        } else {
+            var routeName = options.BusRouteName;
+            if (routeName == null || routeName === '') {
+                options.errorType = 'routeNameNull';
                 reject(options);
-            } else {
-                var route = _.filter(data, function (r) {
-                    return r.rtnm.toLowerCase() === routeName.replace('/', 'and').toLowerCase();
-                });
-                if(route == null || route.length < 1){
-                    options.errorType = 'routeNameError';
-                    reject(options);                    
-                }
-                options.BusRouteNumber = route[0].rt;
-                resolve(options);
             }
-        });
+
+            busTracker.routes(function (err, data) {
+                if (err) {
+                    console.dir('err', err);
+                }
+                if (data == null) {
+                    //TODO: why result = null
+                    options.errorType = 'routeNameError';
+                    reject(options);
+                } else {
+                    var route = _.filter(data, function (r) {
+                        return r.rtnm.replace('/', ' and ').toLowerCase() === routeName.toLowerCase();
+                    });
+                    if (route == null || route.length < 1) {
+                        options.errorType = 'routeNameError';
+                        reject(options);
+                    } else {
+                        options.BusRouteNumber = route[0].rt;
+                        resolve(options);
+                    }
+                }
+            });
+        }
     });
 }
 
@@ -142,7 +144,7 @@ function getRouteDirections(options) {
         if (routeId == null || routeId === '') {
             options.errorType = 'routeNumberNull';
             reject(options);
-        } 
+        }
 
         busTracker.routeDirections(routeId, function (err, data) {
             if (err) {
@@ -219,22 +221,22 @@ function _errorText(errorType) {
             break;
         case 'crossStreetError':
             returnText += 'the cross street or stop name were not listed on the bus route. Please, try again using the direction, route number, and cross streets.  For the most accurate results use the bus stop ID number';
-            break;          
+            break;
         case 'stopError':
             returnText += 'please tell me the bus stop ID number for the stop you would like the schedule for';
-            break; 
+            break;
         case 'routeNumberInvalid':
             returnText += 'that bus route number returned no results. Please double check the route number.';
-            break; 
+            break;
         case 'routeNumberNull':
             returnText += 'I did not catch that route number.  Please specify the bus route number when requesting a bus schedule by direction, route number, and cross streets.';
-            break;      
+            break;
         case 'routeNameNull':
             returnText += 'please tell me the name of the bus route.  You can use either the number or the name.';
-            break;    
+            break;
         case 'routeNameError':
             returnText += 'I did not find any results for that route name.  Please double check the route name and try again.';
-            break;                                             
+            break;
         default:
             returnText += 'please try again using the direction, bus route number, and cross streets.  For the most accurate results use the bus stop ID number';
             break;
@@ -243,10 +245,10 @@ function _errorText(errorType) {
 }
 
 module.exports = {
-    getRouteNumber : getRouteNumber,
-    getRouteDirections : getRouteDirections,
-    getStopSchedule : getStopSchedule,
-    getRouteStop : getRouteStop,
-    renderBusText : renderBusText,
-    errorHandler : errorHandler
+    getRouteNumber: getRouteNumber,
+    getRouteDirections: getRouteDirections,
+    getStopSchedule: getStopSchedule,
+    getRouteStop: getRouteStop,
+    renderBusText: renderBusText,
+    errorHandler: errorHandler
 }

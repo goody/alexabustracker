@@ -11,33 +11,33 @@ var busTracker = require('./myBusTracker.js');
 //for local testing
 var options = {
     // // // a list of up to 10 stop IDs 
-    stopIds: [ "3766" ],
-    // topCount is optional 
-    topCount: 5
-    // BusRouteNumber: 81,
-    // RouteDirection: 'East',
-    // BusStopName: 'Lawrence and Clark',
-    // BusRouteName: 'Lawrence'
+    // stopIds: [ "3766" ],
+    // // topCount is optional 
+    // topCount: 5
+    BusRouteNumber: 'J14',
+    RouteDirection: 'North',
+    BusStopName: 'Balbo and Columbus',
+    BusRouteName: ''
 };
 
-busTracker.getStopSchedule(options)
-.then(busTracker.renderBusText); 
+// busTracker.getStopSchedule(options)
+// .then(busTracker.renderBusText); 
 
 // busTracker.getRouteNumber(options)
 // .then(function(val){
 //     console.log(val);
 // });
 
-// busTracker.getRouteNumber(options)
-// .then(busTracker.getRouteDirections)
-// .then(busTracker.getRouteStop)
-// //getRouteStop(options)
-// .then(busTracker.getStopSchedule)
-// // .then(function(val){
-// //     console.log(renderBusText(val));
-// // })
-// .catch(busTracker.errorHandler)
-// .then(busTracker.renderBusText);
+busTracker.getRouteNumber(options)
+.then(busTracker.getRouteDirections)
+.then(busTracker.getRouteStop)
+//getRouteStop(options)
+.then(busTracker.getStopSchedule)
+// .then(function(val){
+//     console.log(renderBusText(val));
+// })
+.catch(busTracker.errorHandler)
+.then(busTracker.renderBusText);
 
 // for local testing
 // getRouteSchedule(options).then(function(val){
