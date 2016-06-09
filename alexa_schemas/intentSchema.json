@@ -4,7 +4,7 @@
       "intent": "BusByStopIntent",
       "slots": [
         {
-          "name": "BusStop",
+          "name": "BusStopId",
           "type": "AMAZON.NUMBER"
         }
       ]
@@ -32,6 +32,15 @@
     },    
     {
       "intent": "AMAZON.HelpIntent"
-    }
+    },
+    {
+      "intent": "StopIntent",
+      "slots": [
+        {
+          "name": "StopWords",
+          "type": "STOP_WORDS"
+        }
+      ]
+    }    
   ]
 }

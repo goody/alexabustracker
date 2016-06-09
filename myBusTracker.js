@@ -48,12 +48,12 @@ function getRouteStop(options) {
     return new Promise(function (resolve, reject) {
         console.log('getRouteStop start.');
         var responseObj = {};
-        var userDirection = options.options.RouteDirection.substring(0,2);
-        var routeId = options.options.BusRouteNumber;
-        var routeName = options.options.BusRouteName;
+        var userDirection = options.RouteDirection.substring(0,2);
+        var routeId = options.BusRouteNumber;
+        var routeName = options.BusRouteName;
         var routeDirection = _.findIndex(options.routeDirections, function(o) { return o.substring(0,2).toLowerCase() === userDirection.toLowerCase(); });
         //var routeDirection = options.routeDirections.indexOf(userDirection)
-        var busStopName = options.options.BusStopName;
+        var busStopName = options.BusStopName;
 
         busTracker.stops(routeId, options.routeDirections[routeDirection], function (err, data) {
             var result = {};
@@ -96,7 +96,11 @@ function getRouteStop(options) {
 function getRouteNumber(options) {
     return new Promise(function (resolve, reject) {
         console.log('getRouteNumber start.');
-        var responseObj = {};
+        //if we already have the route number
+        if(options.busRouteNumber != null || options.busRouteNumber != ''){
+            console.log('already had route #');
+            resolve(options);
+        }
         var routeName = options.BusRouteName;
         if (routeName == null || routeName === '') {
             options.errorType = 'routeNameNull';
@@ -112,17 +116,15 @@ function getRouteNumber(options) {
                 options.errorType = 'routeNameError';
                 reject(options);
             } else {
-                var routeNumber = _.filter(data, function (r) {
+                var route = _.filter(data, function (r) {
                     return r.rtnm.toLowerCase() === routeName.replace('/', 'and').toLowerCase();
                 });
-                if(routeNumber == null || routeNumber === {}){
+                if(route == null || route.length < 1){
                     options.errorType = 'routeNameError';
                     reject(options);                    
                 }
-                responseObj.routeNumber = routeNumber;
-                //pass along original params
-                responseObj.options = options;
-                resolve(responseObj);
+                options.BusRouteNumber = route[0].rt;
+                resolve(options);
             }
         });
     });
@@ -137,7 +139,6 @@ function getRouteNumber(options) {
 function getRouteDirections(options) {
     return new Promise(function (resolve, reject) {
         console.log('getRouteDirections start.');
-        var responseObj = {};
         var routeId = options.BusRouteNumber;
         if (routeId == null || routeId === '') {
             options.errorType = 'routeNumberNull';
@@ -154,10 +155,8 @@ function getRouteDirections(options) {
                 reject(options);
             } else {
                 //return array of directions
-                responseObj.routeDirections = data;
-                //pass along original params
-                responseObj.options = options;
-                resolve(responseObj);
+                options.routeDirections = data;
+                resolve(options);
             }
         });
     });
@@ -258,7 +257,7 @@ var options = {
     // topCount: 5
     BusRouteNumber: 81,
     RouteDirection: 'East',
-    BusStopName: 'Lawrence',
+    BusStopName: 'Lawrence and Clark',
     BusRouteName: 'Lawrence'
 };
 
@@ -266,20 +265,21 @@ var options = {
 //    console.log(renderBusText(val)); 
 // });
 
-getRouteNumber(options)
-.then(function(val){
-    console.log(val);
-});
+// getRouteNumber(options)
+// .then(function(val){
+//     console.log(val);
+// });
 
-// getRouteDirections(options)
-// .then(getRouteStop)
-// //getRouteStop(options)
-// .then(getStopSchedule)
+getRouteNumber(options)
+.then(getRouteDirections)
+.then(getRouteStop)
+//getRouteStop(options)
+.then(getStopSchedule)
 // .then(function(val){
 //     console.log(renderBusText(val));
 // })
-// .catch(_errorHandler)
-// .then(renderBusText);
+.catch(errorHandler)
+.then(renderBusText);
 
 // for local testing
 // getRouteSchedule(options).then(function(val){
@@ -295,6 +295,7 @@ getRouteNumber(options)
 // console.log(stop);
 
 module.exports = {
+    getRouteNumber : getRouteNumber,
     getRouteDirections : getRouteDirections,
     getStopSchedule : getStopSchedule,
     getRouteStop : getRouteStop,
