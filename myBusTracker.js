@@ -243,57 +243,6 @@ function _errorText(errorType) {
     return returnText;
 }
 
-/***
- * 
- * Testing
- * 
- * */
-
-//for local testing
-var options = {
-    // // // a list of up to 10 stop IDs 
-    // stopIds: [ "3766" ],
-    // // topCount is optional 
-    // topCount: 5
-    BusRouteNumber: 81,
-    RouteDirection: 'East',
-    BusStopName: 'Lawrence and Clark',
-    BusRouteName: 'Lawrence'
-};
-
-// getStopSchedule(options).then(function(val){
-//    console.log(renderBusText(val)); 
-// });
-
-// getRouteNumber(options)
-// .then(function(val){
-//     console.log(val);
-// });
-
-getRouteNumber(options)
-.then(getRouteDirections)
-.then(getRouteStop)
-//getRouteStop(options)
-.then(getStopSchedule)
-// .then(function(val){
-//     console.log(renderBusText(val));
-// })
-.catch(errorHandler)
-.then(renderBusText);
-
-// for local testing
-// getRouteSchedule(options).then(function(val){
-//     console.log('val final: ', val);
-// })
-// .catch(function(err){
-//     console.log('err: ', err);
-// });
-
-// var stop = _.filter(routeObj, function (r) {
-//     return r.rtnm.toLowerCase() === 'hyde park express';
-// });
-// console.log(stop);
-
 module.exports = {
     getRouteNumber : getRouteNumber,
     getRouteDirections : getRouteDirections,
