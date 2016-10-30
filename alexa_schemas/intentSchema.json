@@ -29,7 +29,10 @@
           "type": "BUS_STOP_NAME"
         }        
       ]
-    },    
+    },
+    {
+      "intent": "LastSuccessIntent"
+    },
     {
       "intent": "AMAZON.HelpIntent"
     },
