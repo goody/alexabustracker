@@ -8,7 +8,6 @@ BUS_STOP_NAME - every bus stop for every route ie both directions
 require('dotenv').config();
 var cta = require('cta-bus-tracker');
 var busTracker = cta(process.env.API_KEY);
-var moment = require('moment-timezone');
 var _ = require('lodash');
 var fs = require('fs');
 var _TOOLS = 'tool_output/';
