@@ -1,7 +1,6 @@
 require('dotenv').config();
 var cta = require('cta-bus-tracker');
 var busTracker = cta(process.env.API_KEY);
-var moment = require('moment-timezone');
 var _ = require('lodash');
 
 /**
@@ -167,27 +166,28 @@ function getRouteDirections(options) {
 
 function renderBusText(responseData) {
     var responseText = '';
-    if (responseData.isError != null) {
-        responseText = responseData.errorMessage;
+    if (responseData.isError !== undefined) {
+        responseText = "error: " + responseData.errorMessage;
     } else {
         var busData = responseData.busData;
         if (Array.isArray(busData)) {
-            var howManyBuses = busData.length;
-            var busTimes = '';
-            for (var i = 0; i < howManyBuses; i++) {
-                if (i === howManyBuses - 1) {
-                    busTimes += ' and ';
-                }
+            // Order the buses by route
+            responseText += "At " + busData[0].stpnm + " " + busData[0].rtdir + ": \n";
 
-                busTimes += _getArrivalTime(busData[i].prdtm).toString();
-
-                if (i != howManyBuses - 1) {
-                    busTimes += ', '; //comma appended to slow down Alexa
+            var currentRoute = -1;
+            for (var i = 0; i < busData.length; i++){
+                // if(i == busData.length-1) { responseText += " and "; }
+                if(currentRoute != busData[i].rt) {
+                    if(i !== 0) responseText += ", ";
+                    responseText += "Route " + busData[i].rt;
+                    currentRoute = busData[i].rt;
+                } else {
+                    responseText += " and";
                 }
+                responseText += " in " + busData[i].prdctdn + " minutes\n";
             }
-            responseText = 'The ' + busData[0].rtdir + ' ' + busData[0].rt + ' bus at ' + busData[0].stpnm + ' has ' + howManyBuses + ' buses arriving in ' + busTimes + ' minutes';
         } else {
-            responseText = 'The ' + busData.rtdir + ' ' + busData.rt + ' bus at ' + busData.stpnm + ' has one bus arriving in ' + _getArrivalTime(busData.prdtm) + ' minutes.';
+            responseText += "Route " + busData.rt + " in " + busData.prdctdn + " minutes.";
         }
     }
     console.log(responseText);
@@ -207,13 +207,6 @@ function errorHandler(error) {
  * internal 
  * 
  */
-
-function _getArrivalTime(expectedTime) {
-    var expected = moment(expectedTime).tz("America/Chicago").format();
-    var current = moment().tz("America/Chicago").format();
-    var arriving = moment(expected).diff(current, 'minutes');
-    return arriving.toString();
-}
 
 function _errorText(errorType) {
     var returnText = 'I had trouble retrieving the bus schedule, ';
@@ -253,4 +246,4 @@ module.exports = {
     getRouteStop: getRouteStop,
     renderBusText: renderBusText,
     errorHandler: errorHandler
-}
+};
