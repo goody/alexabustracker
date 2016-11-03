@@ -105,10 +105,10 @@ function getWelcomeResponse(callback) {
     var sessionAttributes = {};
     var cardTitle = "Welcome";
     var speechOutput = "Welcome to the Chicago Bus Stop skill. " +
-        "Please tell me which bus stop you would like the schedule for.  For example, ask me,  when is the next bus at stop 3773";
+        "Please tell me which bus stop you would like the schedule for.";
     // If the user either does not reply to the welcome message or says something that is not
     // understood, they will be prompted again with this text.
-    var repromptText = "Which stop would you like to know the schedule for";
+    var repromptText = "For example, ask me,  when is the next bus at stop three seven seven three";
     var shouldEndSession = false;
 
     callback(sessionAttributes,
@@ -120,7 +120,7 @@ function getHelp(callback) {
     var sessionAttributes = {};
     var cardTitle = "Help";
     var speechOutput = "To get the schedule for a bus stop either ask for the next buses at that specific stop number, or, give the direction, route number, and cross streets," +
-        "For example, when are the next buses at stop number 3766, or, when is the next north bound twenty two bus at Clark and Addison.";
+        "For example, when are the next buses at stop number three seven six six, or, when is the next north bound twenty two bus at Clark and Addison.";
     // If the user either does not reply to the welcome message or says something that is not
     // understood, they will be prompted again with this text.
     var repromptText = "Which stop would you like to know the schedule for";

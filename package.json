@@ -20,10 +20,8 @@
   "author": "Scot Goodhart",
   "license": "ISC",
   "dependencies": {
-    "cta-bus-tracker": "0.0.2",
-    "lodash": "^4.11.2",
-    "moment": "^2.13.0",
-    "moment-timezone": "^0.5.3"
+    "cta-bus-tracker": "https://github.com/BoldBigflank/Node-CTA-Bus-Tracker.git",
+    "lodash": "^4.11.2"
   },
   "devDependencies": {
     "dotenv": "^2.0.0"
