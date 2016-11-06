@@ -149,19 +149,19 @@ function getBusByStop(intent, session, callback) {
         .catch(busTracker.errorHandler)
         .then(function (results) {
             speechOutput = busTracker.renderBusText(results);
-            console.log(results);
             //add logic to test success and return end sessions
             shouldEndSession = results.isError ? false : true;
             if(!results.isError) {
                 storage.loadUser(session, function(userData){
-                    userData.busType = "stop";
-                    userData.slots = intent.slots;
-                    userData.save();
+                    userData.data.busType = "stop";
+                    userData.data.slots = intent.slots;
+                    userData.save(function(){
+                        repromptText = results.repromptText ? results.repromptText : '';
+                        callback(sessionAttributes,
+                            buildSpeechletResponse(cardTitle, speechOutput, repromptText, shouldEndSession));
+                    });
                 });
             }
-            repromptText = results.repromptText ? results.repromptText : '';
-            callback(sessionAttributes,
-                buildSpeechletResponse(cardTitle, speechOutput, repromptText, shouldEndSession));
         });
 
 }
@@ -190,7 +190,6 @@ function getBusByRoute(intent, session, callback) {
         .then(busTracker.getStopSchedule)
         .catch(busTracker.errorHandler)
         .then(function (results) {
-            console.log(results);
             speechOutput = busTracker.renderBusText(results);
             //add logic to test success and return end sessions
             shouldEndSession = results.isError ? false : true;

@@ -33,7 +33,7 @@ var storage = (function () {
             var allEmpty = true;
             var userData = this.data;
             userData.players.forEach(function (player) {
-                if (userDataData.scores[player] !== 0) {
+                if (userData.scores[player] !== 0) {
                     allEmpty = false;
                 }
             });
@@ -66,9 +66,8 @@ var storage = (function () {
 
     return {
         loadUser: function (session, callback) {
-            console.log("loadUser");
-            if (session.attributes.currentUser) {
-                console.log('get User from session=' + session.attributes.currentUser);
+            if (session.attributes && session.attributes.currentUser) {
+                // console.log('get User from session=' + session.attributes.currentUser);
                 callback(new User(session, session.attributes.currentUser));
                 return;
             }
@@ -81,19 +80,16 @@ var storage = (function () {
                 }
             }, function (err, data) {
                 var currentUser;
+                if(!session.attributes) session.attributes = {};
                 if (err) {
-                    console.log(err, err.stack);
                     currentUser = new User(session);
                     session.attributes.currentUser = currentUser.data;
                     callback(currentUser);
                 } else if (data.Item === undefined) {
-                    console.log("Item undefined");
                     currentUser = new User(session);
                     session.attributes.currentUser = currentUser.data;
-                    console.log(currentUser);
                     callback(currentUser);
                 } else {
-                    console.log('get User from dynamodb=' + data.Item.Data.S);
                     currentUser = new User(session, JSON.parse(data.Item.Data.S));
                     session.attributes.currentUser = currentUser.data;
                     callback(currentUser);
@@ -101,7 +97,6 @@ var storage = (function () {
             });
         },
         newUser: function (session) {
-            console.log("making a new user");
             return new User(session);
         }
     };
