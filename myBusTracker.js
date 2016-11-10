@@ -185,6 +185,8 @@ function renderBusText(responseData) {
                 }
                 if(busData[i].prdctdn == "DUE") {
                     responseText += " is DUE";
+                } else if (busData[i].prdctdn == "DLY") {
+                    responseText += " is delayed";
                 } else {
                     responseText += " in " + busData[i].prdctdn + " minutes";
                 }
