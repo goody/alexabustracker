@@ -25,4 +25,5 @@ BusByRouteIntent when is the next {BusRouteName} bus at {BusStopName} headed {Ro
 LastSuccessIntent when is the next bus
 LastSuccessIntent what is the bus schedule
 LastSuccessIntent when the next bus is
+LastSuccessIntent my schedule
 StopIntent {StopWords}
