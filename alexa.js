@@ -161,6 +161,9 @@ function getBusByStop(intent, session, callback) {
                             buildSpeechletResponse(cardTitle, speechOutput, repromptText, shouldEndSession));
                     });
                 });
+            } else {
+                callback(sessionAttributes,
+                    buildSpeechletResponse(cardTitle, speechOutput, repromptText, shouldEndSession));
             }
         });
 
@@ -204,6 +207,9 @@ function getBusByRoute(intent, session, callback) {
                             buildSpeechletResponse(cardTitle, speechOutput, repromptText, shouldEndSession));
                     });
                 });
+            } else {
+                callback(sessionAttributes,
+                    buildSpeechletResponse(cardTitle, speechOutput, repromptText, shouldEndSession));
             }
         });
 }
