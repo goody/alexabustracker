@@ -161,6 +161,9 @@ function getBusByStop(intent, session, callback) {
                             buildSpeechletResponse(cardTitle, speechOutput, repromptText, shouldEndSession));
                     });
                 });
+            } else {
+                callback(sessionAttributes,
+                    buildSpeechletResponse(cardTitle, speechOutput, repromptText, shouldEndSession));
             }
         });
 
@@ -196,13 +199,18 @@ function getBusByRoute(intent, session, callback) {
             repromptText = results.repromptText ? results.repromptText : '';
             if(!results.isError) {
                 storage.loadUser(session, function(userData){
-                    userData.busType = "route";
-                    userData.slots = intent.slots;
-                    userData.save();
+                    userData.data.busType = "route";
+                    userData.data.slots = intent.slots;
+                    userData.save(function(){
+                        repromptText = results.repromptText ? results.repromptText : '';
+                        callback(sessionAttributes,
+                            buildSpeechletResponse(cardTitle, speechOutput, repromptText, shouldEndSession));
+                    });
                 });
+            } else {
+                callback(sessionAttributes,
+                    buildSpeechletResponse(cardTitle, speechOutput, repromptText, shouldEndSession));
             }
-            callback(sessionAttributes,
-                buildSpeechletResponse(cardTitle, speechOutput, repromptText, shouldEndSession));
         });
 }
 
