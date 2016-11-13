@@ -205,8 +205,6 @@ function getBusByRoute(intent, session, callback) {
                     });
                 });
             }
-            callback(sessionAttributes,
-                buildSpeechletResponse(cardTitle, speechOutput, repromptText, shouldEndSession));
         });
 }
 
