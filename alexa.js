@@ -1,5 +1,6 @@
 require('dotenv').config();
 var busTracker = require('./myBusTracker.js');
+var storage = require('./storage.js');
 
 // Route the incoming request based on type (LaunchRequest, IntentRequest,
 // etc.) The JSON body of the request is provided in the event parameter.
@@ -76,7 +77,9 @@ function onIntent(intentRequest, session, callback) {
         getBusByStop(intent, session, callback);
     } else if ("BusByRouteIntent" === intentName) {
         getBusByRoute(intent, session, callback);
-    } else if ("AMAZON.HelpIntent" === intentName) {
+    } else if ("LastSuccessIntent" === intentName) {
+        getLastBus(intent, session, callback);
+    }else if ("AMAZON.HelpIntent" === intentName) {
         getHelp(callback);
     } else if ("AMAZON.StopIntent" === intentName || "AMAZON.CancelIntent" === intentName || "StopIntent" === intentName) {
         handleSessionEndRequest(callback);
@@ -146,12 +149,19 @@ function getBusByStop(intent, session, callback) {
         .catch(busTracker.errorHandler)
         .then(function (results) {
             speechOutput = busTracker.renderBusText(results);
-            console.log(results);
             //add logic to test success and return end sessions
             shouldEndSession = results.isError ? false : true;
-            repromptText = results.repromptText ? results.repromptText : '';
-            callback(sessionAttributes,
-                buildSpeechletResponse(cardTitle, speechOutput, repromptText, shouldEndSession));
+            if(!results.isError) {
+                storage.loadUser(session, function(userData){
+                    userData.data.busType = "stop";
+                    userData.data.slots = intent.slots;
+                    userData.save(function(){
+                        repromptText = results.repromptText ? results.repromptText : '';
+                        callback(sessionAttributes,
+                            buildSpeechletResponse(cardTitle, speechOutput, repromptText, shouldEndSession));
+                    });
+                });
+            }
         });
 
 }
@@ -180,14 +190,35 @@ function getBusByRoute(intent, session, callback) {
         .then(busTracker.getStopSchedule)
         .catch(busTracker.errorHandler)
         .then(function (results) {
-            console.log(results);
             speechOutput = busTracker.renderBusText(results);
             //add logic to test success and return end sessions
             shouldEndSession = results.isError ? false : true;
             repromptText = results.repromptText ? results.repromptText : '';
+            if(!results.isError) {
+                storage.loadUser(session, function(userData){
+                    userData.busType = "route";
+                    userData.slots = intent.slots;
+                    userData.save();
+                });
+            }
             callback(sessionAttributes,
                 buildSpeechletResponse(cardTitle, speechOutput, repromptText, shouldEndSession));
         });
+}
+
+function getLastBus(intent, session, callback) {
+    storage.loadUser(session, function(userData) {
+        intent.slots = session.attributes.currentUser.slots;
+
+        if(!session.attributes.currentUser || !session.attributes.currentUser.busType) {
+            getWelcomeResponse(callback);
+        } else if(session.attributes.currentUser.busType == "route") {
+            getBusByRoute(intent, session, callback);
+        } else {
+            // busType == "stop"
+            getBusByStop(intent, session, callback);
+        }
+    });
 }
 
 function handleSessionEndRequest(callback) {

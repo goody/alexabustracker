@@ -178,13 +178,20 @@ function renderBusText(responseData) {
             for (var i = 0; i < busData.length; i++){
                 // if(i == busData.length-1) { responseText += " and "; }
                 if(currentRoute != busData[i].rt) {
-                    if(i !== 0) responseText += ", ";
                     responseText += "Route " + busData[i].rt;
                     currentRoute = busData[i].rt;
                 } else {
                     responseText += " and";
                 }
-                responseText += " in " + busData[i].prdctdn + " minutes\n";
+                if(busData[i].prdctdn == "DUE") {
+                    responseText += " is DUE";
+                } else if (busData[i].prdctdn == "DLY") {
+                    responseText += " is delayed";
+                } else {
+                    responseText += " in " + busData[i].prdctdn + " minutes";
+                }
+                if(i !== busData.length-1) responseText += ", ";
+                responseText += "\n";
             }
         } else {
             responseText += "Route " + busData.rt + " in " + busData.prdctdn + " minutes.";
