@@ -195,14 +195,23 @@ function getBusByRoute(intent, session, callback) {
             shouldEndSession = results.isError ? false : true;
             repromptText = results.repromptText ? results.repromptText : '';
             if(!results.isError) {
+                var slots = {
+                    "BusStopId":
+                    {
+                        "name": "BusStopId",
+                        "value": results.busData[0].stpid
+                    }
+                };
                 storage.loadUser(session, function(userData){
-                    userData.busType = "route";
-                    userData.slots = intent.slots;
-                    userData.save();
+                    userData.data.busType = "stop";
+                    userData.data.slots = slots;
+                    userData.save(function(){
+                        repromptText = results.repromptText ? results.repromptText : '';
+                        callback(sessionAttributes,
+                            buildSpeechletResponse(cardTitle, speechOutput, repromptText, shouldEndSession));
+                    });
                 });
             }
-            callback(sessionAttributes,
-                buildSpeechletResponse(cardTitle, speechOutput, repromptText, shouldEndSession));
         });
 }
 
