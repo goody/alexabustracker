@@ -68,7 +68,7 @@ function getRouteStop(options) {
             } else {
                 //filter results on cross street
                 var stop = _.filter(data, function (b) {
-                    return b.stpnm.toLowerCase() === busStopName.replace('and', '&').toLowerCase();
+                    return b.stpnm.toLowerCase() === busStopName.replace(' and ', ' & ').toLowerCase();
                 });
 
                 //return false and reject if no ids found
@@ -205,6 +205,7 @@ function errorHandler(error) {
     error.isError = true;
     error.errorMessage = _errorText(error.errorType);
     error.repromptText = 'Which bus stop would you like the schedule for?';
+    console.log('BUS STOP ERROR INFO');
     console.log(error);
     return error;
 }
