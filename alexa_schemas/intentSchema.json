@@ -35,15 +35,6 @@
     },
     {
       "intent": "AMAZON.HelpIntent"
-    },
-    {
-      "intent": "StopIntent",
-      "slots": [
-        {
-          "name": "StopWords",
-          "type": "STOP_WORDS"
-        }
-      ]
-    }    
+    }
   ]
 }

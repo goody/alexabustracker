@@ -66,7 +66,7 @@ function onLaunch(launchRequest, session, callback) {
  * Called when the user specifies an intent for this skill.
  */
 function onIntent(intentRequest, session, callback) {
-    console.log("onIntent requestId=" + intentRequest.requestId +
+    console.log("onIntent " + intentRequest.intent.name + " requestId=" + intentRequest.requestId +
         ", sessionId=" + session.sessionId);
 
     var intent = intentRequest.intent,
@@ -136,6 +136,15 @@ function getBusByStop(intent, session, callback) {
     var shouldEndSession = false;
     var sessionAttributes = {};
     var busStop = intent.slots.BusStopId.value;
+
+    // // If it's actually a route number, change over
+    // if(busStop <= 206) {
+    //     sessionAttributes.options = sessionAttributes.options || {};
+    //     sessionAttributes.options.BusRouteNumber = busStop;
+    //     // Not gonna work until we handle separate Intents' slots better
+    //     return getBusByRoute(intent, session, callback);
+    // }
+
     console.log('REQUEST getBusByStop:');
     console.log('stp: ' + busStop);
     var options = {
@@ -173,19 +182,19 @@ function getBusByRoute(intent, session, callback) {
     var cardTitle = "Getting Bus by Direction, Route, and Stop Name/Cross Streets";
     var repromptText = "";
     var shouldEndSession = false;
-    var sessionAttributes = {};
-    var routeDirection = intent.slots.RouteDirection.value;
-    var busRouteNumber = intent.slots.BusRouteNumber.value;
-    var busStopName = intent.slots.BusStopName.value;
-    var busRouteName = intent.slots.BusRouteName.value;
-    console.log('REQUEST getBusByRoute:');
-    console.log('dir: ' + routeDirection, '#: ' + busRouteNumber, 'stp: ' + busStopName, 'nm: ' + busRouteName);
-    var options = {
-        RouteDirection: routeDirection,
-        BusRouteNumber: busRouteNumber,
-        BusRouteName: busRouteName,
-        BusStopName: busStopName
-    };
+    var sessionAttributes = session.attributes || {};
+    if (!sessionAttributes.options) sessionAttributes.options = {};
+    var options = sessionAttributes.options;
+    // Remove old error stuff
+    options.isError = false;
+    options.errorType = null;
+    options.errorMessage = null;
+    // Pull new intent slots
+    options.RouteDirection = intent.slots.RouteDirection.value || options.RouteDirection;
+    options.BusRouteNumber = intent.slots.BusRouteNumber.value || options.BusRouteNumber;
+    options.BusStopName = intent.slots.BusStopName.value || options.BusStopName;
+    options.BusRouteName = intent.slots.BusRouteName.value || options.BusRouteName;
+    sessionAttributes.options = options;
     var speechOutput = '';
     busTracker.getRouteNumber(options)
         .then(busTracker.getRouteDirections)
