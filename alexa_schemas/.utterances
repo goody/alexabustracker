@@ -1,7 +1,15 @@
 BusByStopIntent when is the next bus at stop {BusStopId}
 BusByStopIntent stop {BusStopId}
 BusByStopIntent bus stop {BusStopId}
-BusByStopIntent {BusStopId}
+
+BusByRouteIntent route {BusRouteNumber}
+BusByRouteIntent route {BusRouteNumber} heading {RouteDirection}
+
+BusByRouteIntent heading {RouteDirection}
+
+BusByRouteIntent {BusRouteNumber}
+BusByRouteIntent {BusStopName}
+
 BusByRouteIntent when the next {RouteDirection} {BusRouteNumber} bus at {BusStopName}
 BusByRouteIntent when the next {RouteDirection} bound {BusRouteNumber} bus at {BusStopName}
 BusByRouteIntent when the next {RouteDirection} bound {BusRouteName} bus at {BusStopName}
@@ -26,4 +34,3 @@ LastSuccessIntent when is the next bus
 LastSuccessIntent what is the bus schedule
 LastSuccessIntent when the next bus is
 LastSuccessIntent my schedule
-StopIntent {StopWords}
